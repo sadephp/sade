@@ -1,6 +1,6 @@
 <template>
     {% if name %}
-        <p>Hello {{ name }}!</p>
+        <p>{{ greeting }} {{ name }}!</p>
     {% endif %}
 
     <form method="post">
@@ -17,7 +17,8 @@
     return [
         'data' => function() {
             return [
-                'name' => $_POST['name'] ?? ''
+                'name' => $_POST['name'] ?? '',
+                'greeting' => 'Hi',
             ];
         }
     ];

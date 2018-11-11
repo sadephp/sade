@@ -1,7 +1,7 @@
 <template>
     <p>{{ greeting }} World!</p>
-    <image />
-    <form />
+    <image></image>
+    <form props-greeting="{{ greeting }}" />
 </template>
 
 <script>

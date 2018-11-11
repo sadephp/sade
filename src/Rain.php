@@ -79,7 +79,23 @@ class Rain
                 $key = pathinfo($file, PATHINFO_FILENAME);
             }
 
-            $components[$key] = $this->render($file);
+            $reg = '/<\s*' . $key . '([^>]*)>(?:(.*?)<\s*\/\s*' . $key .'>|)/';
+            $data = [];
+
+            // Extra props attributes.
+            if (preg_match_all($reg, $types['template'], $matches)) {
+                foreach ($matches[1] as $attribute) {
+                    $attribute = str_replace(' /', '', $attribute);
+                    $attribute = trim($attribute);
+
+                    if (preg_match('/(.+)\=\"([^"]*)\"/', $attribute, $matches2)) {
+                        $prop = str_replace('props-', '', $matches2[1]);
+                        $data[$prop] = $matches2[2];
+                    }
+                }
+            }
+
+            $components[$key] = $this->render($file, $data);
         }
 
         return $components;
@@ -122,10 +138,11 @@ class Rain
      * Render component file.
      *
      * @param  string $file
+     * @param  array  $data
      *
      * @return mixed
      */
-    public function render($file)
+    public function render($file, $data = [])
     {
         $file = $this->file($file);
 
@@ -174,18 +191,16 @@ class Rain
 
         // Generate component id.
         $id = $this->id($file);
+        $data = array_merge($this->data($types), $data);
 
         // Create template html.
         $template = (new Template([
             'content' => $types['template'],
             'id'      => $id,
             'scoped'  => $scoped,
-        ]))->render($this->data($types));
+        ]))->render($data);
 
-        // Replace components tags.
-        foreach ($this->components($types) as $key => $html) {
-            $template = preg_replace('/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/', $html, $template);
-        }
+        $template = $this->renderComponents($template, $types);
 
         // Append style html.
         $template .= (new Style([
@@ -194,6 +209,28 @@ class Rain
             'scoped'  => $scoped,
         ]))->render();
         
+        return $template;
+    }
+
+    /**
+     * Render components.
+     *
+     * @param  string $template
+     * @param  array  $types
+     *
+     * @return string
+     */
+    protected function renderComponents($template, $types)
+    {
+        $types['template'] = $template;
+
+        $components = $this->components($types);
+
+        // Replace components tags.
+        foreach ($components as $key => $html) {
+            $template = preg_replace('/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/', $html, $template);
+        }
+
         return $template;
     }
 

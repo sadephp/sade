@@ -9,7 +9,7 @@ Just a prototype of how to create Vue components but in PHP.
 ```vue
 <template>
     <p>{{ greeting }} World!</p>
-    <image />
+    <image props-alt="{{ greeting }}" />
 </template>
 
 <script>
