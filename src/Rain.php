@@ -4,7 +4,6 @@ namespace Frozzare\Rain;
 
 class Rain
 {
-
     /**
      * Rain options.
      *
@@ -16,6 +15,13 @@ class Rain
             'scoped' => false
         ]
     ];
+
+    /**
+     * Script value.
+     *
+     * @var array
+     */
+    protected $script = [];
 
     /**
      * Rain construct.
@@ -62,19 +68,19 @@ class Rain
      */
     protected function components($types)
     {
-        $data = $this->script($types);
+        $script = $this->script($types);
 
-        if (empty($data['components'])) {
+        if (empty($script['components'])) {
             return [];
         }
 
-        if (!is_array($data['components'])) {
+        if (!is_array($script['components'])) {
             return [];
         }
 
         $components = [];
 
-        foreach ($data['components'] as $key => $file) {
+        foreach ($script['components'] as $key => $file) {
             if (is_numeric($key)) {
                 $key = pathinfo($file, PATHINFO_FILENAME);
             }
@@ -89,8 +95,7 @@ class Rain
                     $attribute = trim($attribute);
 
                     if (preg_match('/(.+)\=\"([^"]*)\"/', $attribute, $matches2)) {
-                        $prop = str_replace('prop-', '', $matches2[1]);
-                        $data[$prop] = $matches2[2];
+                        $data[$matches2[1]] = $matches2[2];
                     }
                 }
             }
@@ -191,6 +196,15 @@ class Rain
 
         // Generate component id.
         $id = $this->id($file);
+        $script = $this->script($types);
+
+        // Remove any prop- prefixes.
+        foreach ($data as $key => $value) {
+            unset($data[$key]);
+            $key = str_replace('prop-', '', $key);
+            $data[$key] = $value;
+        }
+
         $data = array_merge($this->data($types), $data);
 
         // Create template html.
@@ -243,8 +257,27 @@ class Rain
      */
     protected function script($types)
     {
-        $script = $types['script'];
+        if (!empty($this->script)) {
+            return $this->script;
+        }
 
-        return eval($script);
+        $script = $types['script'];
+        $result = eval($script);
+
+        if (!is_array($result)) {
+            $result = [];
+        }
+
+        $defaults = [
+            'data' => function () {
+            },
+            'components' => [],
+        ];
+
+        $result = array_merge($defaults, $result);
+
+        $this->scirpt = $result;
+
+        return $result;
     }
 }

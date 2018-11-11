@@ -8,7 +8,7 @@
             <input type="text" name="name" />
         </p>
         <p>
-            <button>Submit</button>
+            <button>{{ submit }}</button>
         </p>
     </form>
 </template>
@@ -19,6 +19,7 @@
             return [
                 'name' => $_POST['name'] ?? '',
                 'greeting' => 'Hi',
+                'submit' => 'Submit',
             ];
         }
     ];

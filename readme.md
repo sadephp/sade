@@ -9,7 +9,7 @@ Just a prototype of PHP components that looks like Vue components.
 ```vue
 <template>
     <p>{{ greeting }} World!</p>
-    <image props-alt="{{ greeting }}" />
+    <image alt="{{ greeting }}" />
 </template>
 
 <script>
