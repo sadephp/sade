@@ -6,7 +6,7 @@ Just a prototype of how to create Vue components but in PHP.
 
 ## Example
 
-```php
+```vue
 <template>
     <p>{{ greeting }} World!</p>
     <image />
