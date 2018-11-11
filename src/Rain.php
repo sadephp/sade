@@ -5,6 +5,13 @@ namespace Frozzare\Rain;
 class Rain
 {
     /**
+     * Component file.
+     *
+     * @var string
+     */
+    protected $file = '';
+
+    /**
      * Rain options.
      *
      * @var array
@@ -31,32 +38,6 @@ class Rain
     public function __construct($options)
     {
         $this->options = array_merge($this->options, $options);
-    }
-
-    /**
-     * Extra from types array.
-     *
-     * @param  array $types
-     *
-     * @return mixed
-     */
-    protected function data($types)
-    {
-        $data = $this->script($types);
-        
-        if (empty($data['data'])) {
-            return [];
-        }
-
-        if (is_array($data['data'])) {
-            return $data['data'];
-        }
-
-        if (is_callable($data['data'])) {
-            return $data['data']();
-        }
-
-        return [];
     }
 
     /**
@@ -107,6 +88,36 @@ class Rain
     }
 
     /**
+     * Extra from types array.
+     *
+     * @param  array $types
+     *
+     * @return mixed
+     */
+    protected function data($types)
+    {
+        $data = $this->script($types);
+        
+        if (empty($data['data'])) {
+            return [];
+        }
+
+        if (is_array($data['data'])) {
+            return $data['data'];
+        }
+
+        if (is_callable($data['data'])) {
+            $data = $data['data']();
+        }
+        
+        if (is_array($data)) {
+            return $data;
+        }
+
+        return [];
+    }
+
+    /**
      * Get component file with directory.
      *
      * @param  string $file
@@ -147,9 +158,11 @@ class Rain
      *
      * @return mixed
      */
-    public function render($file, $data = [])
+    public function render($file, array $data = [])
     {
-        $file = $this->file($file);
+        $this->reset();
+
+        $this->file = $file = $this->file($file);
 
         if (!file_exists($file)) {
             return;
@@ -196,7 +209,6 @@ class Rain
 
         // Generate component id.
         $id = $this->id($file);
-        $script = $this->script($types);
 
         // Remove any prop- prefixes.
         foreach ($data as $key => $value) {
@@ -249,6 +261,13 @@ class Rain
     }
 
     /**
+     * Reset properties.
+     */
+    protected function reset() {
+        $this->script = null;
+    }
+
+    /**
      * Eval script.
      *
      * @param  array $types
@@ -261,11 +280,14 @@ class Rain
             return $this->script;
         }
 
-        $script = $types['script'];
-        $result = eval($script);
+        $result = require $this->file;
+        if (empty($result) || !is_array($result)) {
+            $script = $types['script'];
+            $result = eval($script);
 
-        if (!is_array($result)) {
-            $result = [];
+            if (!is_array($result)) {
+                $result = [];
+            }
         }
 
         $defaults = [
@@ -276,7 +298,7 @@ class Rain
 
         $result = array_merge($defaults, $result);
 
-        $this->scirpt = $result;
+        $this->script = $result;
 
         return $result;
     }

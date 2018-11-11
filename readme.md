@@ -47,6 +47,31 @@ $rain = new \Frozzare\Rain\Rain( [
 echo $rain->render( 'greeting.php' );
 ```
 
+With PHP tags:
+
+```vue
+<template>
+    <p>{{ greeting }} World!</p>
+</template>
+
+<?php
+    return [
+        'data' => function() {
+            return [
+                'greeting' => 'Hello'
+            ];
+        }
+    ];
+?>
+
+<style scoped>
+    p {
+        font-size: 2em;
+        text-align: center;
+    }
+</style>
+```
+
 ## License
 
 MIT © [Fredrik Forsmo](https://github.com/frozzare)

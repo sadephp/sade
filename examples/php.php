@@ -1,22 +1,16 @@
 <template>
     <p>{{ greeting }} World!</p>
-    <image />
-    <form greeting="{{ greeting }}" />
 </template>
 
-<script>
+<?php
     return [
         'data' => function() {
             return [
                 'greeting' => 'Hello'
             ];
-        },
-        'components' => [
-            'image' => 'image.php',
-            'form.php',
-        ]
+        }
     ];
-</script>
+?>
 
 <style scoped>
     p {
