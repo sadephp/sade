@@ -20,7 +20,7 @@ Just a prototype of how to create Vue components but in PHP.
             ];
         },
         'components' => [
-            'image' => 'image.php',
+            'image.php'
         ]
     ];
 </script>
