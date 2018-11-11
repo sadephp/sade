@@ -49,7 +49,7 @@ echo $rain->render( 'greeting.php' );
 
 With PHP tags:
 
-```vue
+```php
 <template>
     <p>{{ greeting }} World!</p>
 </template>
