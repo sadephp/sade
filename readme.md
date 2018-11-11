@@ -6,6 +6,8 @@ Just a prototype of PHP components that looks like Vue components.
 
 ## Example
 
+Using [eval](https://secure.php.net/manual/en/function.eval.php) for script code:
+
 ```vue
 <template>
     <p>{{ greeting }} World!</p>
