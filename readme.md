@@ -2,7 +2,7 @@
 
 > Should not be used in production
 
-Just a prototype of how to create Vue components but in PHP.
+Just a prototype of PHP components that looks like Vue components.
 
 ## Example
 
