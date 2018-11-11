@@ -35,20 +35,6 @@ Using [eval](https://secure.php.net/manual/en/function.eval.php) for script code
 </style>
 ```
 
-To render
-
-```php
-$rain = new \Frozzare\Rain\Rain( [
-    'dir'   => __DIR__ . '/examples',
-    'style' => [
-        // Force scoped style.
-        'scoped' => true
-    ]
-] );
-
-echo $rain->render( 'greeting.php' );
-```
-
 With PHP tags:
 
 ```php
@@ -72,6 +58,20 @@ With PHP tags:
         text-align: center;
     }
 </style>
+```
+
+To render
+
+```php
+$rain = new \Frozzare\Rain\Rain( [
+    'dir'   => __DIR__ . '/examples',
+    'style' => [
+        // Force scoped style.
+        'scoped' => true
+    ]
+] );
+
+echo $rain->render( 'greeting.php' );
 ```
 
 ## License
