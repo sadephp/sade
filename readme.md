@@ -40,6 +40,7 @@ With PHP tags:
 ```php
 <template>
     <p>{{ greeting }} World!</p>
+    <image alt="{{ greeting }}" />
 </template>
 
 <?php
@@ -48,7 +49,10 @@ With PHP tags:
             return [
                 'greeting' => 'Hello'
             ];
-        }
+        },
+        'components' => [
+            'image.php'
+        ]
     ];
 ?>
 
