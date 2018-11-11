@@ -6,13 +6,15 @@ use Sabberworm\CSS\Parser;
 
 class Style
 {
-
     /**
      * Style options.
      *
      * @var array
      */
-    protected $options;
+    protected $options = [
+        'content' => '',
+        'id' => '',
+    ];
 
     /**
      * CSS Parser
@@ -28,8 +30,8 @@ class Style
      */
     public function __construct($options)
     {
-        $this->options = $options;
-        $this->parser = new Parser($options['content']);
+        $this->options = array_merge($this->options, $options);
+        $this->parser = new Parser($this->options['content']);
     }
 
     /**

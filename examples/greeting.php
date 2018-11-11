@@ -2,6 +2,7 @@
     <p>{{ greeting }} World!</p>
     <image />
     <form greeting="{{ greeting }}" />
+    <p>UniqID ID is {{ uniqid() }}</p>
 </template>
 
 <script>
@@ -14,6 +15,11 @@
         'components' => [
             'image' => 'image.php',
             'form.php',
+        ],
+        'methods' => [
+            'uniqid' => function() {
+                return uniqid();
+            }
         ]
     ];
 </script>

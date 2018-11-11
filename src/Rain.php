@@ -209,6 +209,7 @@ class Rain
 
         // Generate component id.
         $id = $this->id($file);
+        $script = $this->script($types);
 
         // Remove any prop- prefixes.
         foreach ($data as $key => $value) {
@@ -223,6 +224,7 @@ class Rain
         $template = (new Template([
             'content' => $types['template'],
             'id'      => $id,
+            'methods' => $script['methods'],
             'scoped'  => $scoped,
         ]))->render($data);
 
@@ -294,6 +296,7 @@ class Rain
             'data' => function () {
             },
             'components' => [],
+            'methods' => [],
         ];
 
         $result = array_merge($defaults, $result);

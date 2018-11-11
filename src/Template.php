@@ -2,18 +2,23 @@
 
 namespace Frozzare\Rain;
 
-use Twig_Loader_Array;
 use Twig_Environment;
+use Twig_Function;
+use Twig_Loader_Array;
 
 class Template
 {
-
     /**
      * Template options.
      *
      * @var array
      */
-    protected $options;
+    protected $options = [
+        'content' => '',
+        'id' => '',
+        'methods' => [],
+        'scoped'  => false,
+    ];
 
     /**
      * Twig environment.
@@ -29,13 +34,21 @@ class Template
      */
     public function __construct($options)
     {
-        $this->options = $options;
+        $this->options = array_merge($this->options, $options);
 
         $loader = new Twig_Loader_Array([
-            'file.rain' => $options['content']
+            'file.rain' => $this->options['content'],
         ]);
 
         $this->twig = new Twig_Environment($loader);
+
+        foreach ($this->options['methods'] as $key => $value) {
+            if (!is_callable($value)) {
+                continue;
+            }
+
+            $this->twig->addFunction(new Twig_Function($key, $value));
+        }
     }
 
     /**
