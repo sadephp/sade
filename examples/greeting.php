@@ -1,6 +1,7 @@
 <template>
     <p>{{ greeting }} World!</p>
     <image />
+    <form />
 </template>
 
 <script>
@@ -12,6 +13,7 @@
         },
         'components' => [
             'image' => 'image.php',
+            'form.php',
         ]
     ];
 </script>
