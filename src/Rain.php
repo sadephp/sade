@@ -89,7 +89,7 @@ class Rain
                     $attribute = trim($attribute);
 
                     if (preg_match('/(.+)\=\"([^"]*)\"/', $attribute, $matches2)) {
-                        $prop = str_replace('props-', '', $matches2[1]);
+                        $prop = str_replace('prop-', '', $matches2[1]);
                         $data[$prop] = $matches2[2];
                     }
                 }
