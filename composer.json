@@ -1,0 +1,16 @@
+{
+    "name": "frozzare/rain",
+    "description": "Vue components but in PHP",
+    "autoload": {
+        "psr-4": {
+            "Frozzare\\Rain\\": "src/"
+        }
+    },
+    "require": {
+        "twig/twig": "^2.0",
+        "sabberworm/php-css-parser": "^8.2"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.3"
+    }
+}
