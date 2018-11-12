@@ -10,6 +10,13 @@ class Rain
     protected $cache;
 
     /**
+     * Components directory.
+     *
+     * @var string
+     */
+    protected $dir = '';
+
+    /**
      * Rain options.
      *
      * @var array
@@ -26,21 +33,22 @@ class Rain
     /**
      * Rain construct.
      *
-     * @param array $options
+     * @param string $dir
+     * @param array  $options
      */
-    public function __construct($options)
+    public function __construct($dir, array $options = [])
     {
         $defaults = [
             'cache'   => [
                 'dir'  => '',
                 'perm' => ( 0755 & ~ umask() ),
             ],
-            'src_dir' => '',
             'style'   => [
                 'scoped' => false
             ],
         ];
 
+        $this->dir = $dir;
         $this->options = array_merge($defaults, $options);
         $this->cache = new Cache($this->options['cache']);
     }
@@ -152,7 +160,7 @@ class Rain
      */
     protected function file($file)
     {
-        $dir = rtrim($this->options['src_dir'], '/') . '/';
+        $dir = rtrim($this->dir, '/') . '/';
         $file = ltrim($file, '/');
         
         if (strpos($file, $dir) !== false) {

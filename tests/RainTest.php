@@ -7,9 +7,7 @@ class RainTest extends TestCase
 {
     public function setUp()
     {
-        $this->rain = new Rain([
-            'src_dir' => __DIR__ . '/testdata'
-        ]);
+        $this->rain = new Rain(__DIR__ . '/testdata');
     }
 
     public function testRender()

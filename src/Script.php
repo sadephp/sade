@@ -20,9 +20,8 @@ class Script
      *
      * @param array $options
      */
-    public function __construct($options)
+    public function __construct(array $options = [])
     {
-        $options = is_array($options) ? $options : [];
         $this->options = array_merge($this->options, $options);
     }
 

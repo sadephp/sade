@@ -55,15 +55,14 @@ Multiple files:
 To render
 
 ```php
-$rain = new \Frozzare\Rain\Rain( [
-    'src_dir' => __DIR__ . '/examples',
-    'style'   => [
+$rain = new \Frozzare\Rain\Rain(__DIR__ . '/examples', [
+    'style' => [
         // Force scoped style.
         'scoped' => true
     ]
-] );
+]);
 
-echo $rain->render( 'greeting.php' );
+echo $rain->render('greeting.php');
 ```
 
 ## License
