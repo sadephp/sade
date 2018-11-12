@@ -191,10 +191,11 @@ class Rain
      * Get methods from model file.
      *
      * @param  array $data
-     * 
+     *
      * @return array
      */
-    protected function methods(array $data) {
+    protected function methods(array $data)
+    {
         $methods = $this->model->methods;
         $data = (object) $data;
 
