@@ -2,12 +2,10 @@
 
 namespace Frozzare\Rain;
 
-use Sabberworm\CSS\Parser;
-
-class Style
+class Script
 {
     /**
-     * Style options.
+     * Script options.
      *
      * @var array
      */
@@ -18,14 +16,7 @@ class Style
     ];
 
     /**
-     * CSS Parser
-     *
-     * @var \Sabberworm\CSS\Parser
-     */
-    protected $parser;
-
-    /**
-     * Style construct.
+     * Script construct.
      *
      * @param array $options
      */
@@ -33,11 +24,10 @@ class Style
     {
         $options = is_array($options) ? $options : [];
         $this->options = array_merge($this->options, $options);
-        $this->parser = new Parser($this->options['content']);
     }
 
     /**
-     * Render style html.
+     * Render script html.
      *
      * @return string
      */
@@ -50,7 +40,7 @@ class Style
         }
 
         if (empty($attributes['type'])) {
-            $attributes['type'] = 'text/css';
+            $attributes['type'] = 'text/javascript';
         }
 
         $attr_html = '';
@@ -59,14 +49,6 @@ class Style
             $attr_html .= sprintf('%s="%s" ', $key, $value);
         }
 
-        $css = $this->parser->parse();
-
-        foreach ($css->getAllDeclarationBlocks() as $block) {
-            foreach ($block->getSelectors() as $selector) {
-                $selector->setSelector('#' . $this->options['id'] . ' ' . $selector->getSelector());
-            }
-        }
-
-        return sprintf('<style %s>%s</style>', $attr_html, $css->render());
+        return sprintf('<script %s>%s</script>', $attr_html, $this->options['content']);
     }
 }

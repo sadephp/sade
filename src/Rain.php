@@ -5,30 +5,23 @@ namespace Frozzare\Rain;
 class Rain
 {
     /**
-     * Component file.
-     *
-     * @var string
+     * Cache instance.
      */
-    protected $file = '';
+    protected $cache;
 
     /**
      * Rain options.
      *
      * @var array
      */
-    protected $options = [
-        'dir' => '',
-        'style' => [
-            'scoped' => false
-        ]
-    ];
+    protected $options = [];
 
     /**
-     * Script value.
+     * Model value.
      *
      * @var array
      */
-    protected $script = [];
+    protected $model = [];
 
     /**
      * Rain construct.
@@ -37,7 +30,49 @@ class Rain
      */
     public function __construct($options)
     {
-        $this->options = array_merge($this->options, $options);
+        $defaults = [
+            'cache'   => [
+                'dir'  => '',
+                'perm' => ( 0755 & ~ umask() ),
+            ],
+            'src_dir' => '',
+            'style'   => [
+                'scoped' => false
+            ],
+        ];
+
+        $this->options = array_merge($defaults, $options);
+        $this->cache = new Cache($this->options['cache']);
+    }
+
+    /**
+     * Extra attributes from html tags.
+     *
+     * @param  string $key
+     * @param  string $content
+     *
+     * @return array
+     */
+    protected function attributes($key, $content)
+    {
+        $reg = '/<\s*' . $key . '([^>]*)>(?:(.*?)<\s*\/\s*' . $key .'>|)/';
+        $data = [];
+
+        // Extra props attributes.
+        if (preg_match_all($reg, $content, $matches)) {
+            foreach ($matches[1] as $attribute) {
+                $attribute = str_replace(' /', '', $attribute);
+                $attribute = trim($attribute);
+
+                if (preg_match('/(.+)\=\"([^"]*)\"/', $attribute, $matches2)) {
+                    $name = explode(' ', $matches2[1]);
+                    $name = array_pop($name);
+                    $data[$name] = $matches2[2];
+                }
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -49,69 +84,52 @@ class Rain
      */
     protected function components($types)
     {
-        $script = $this->script($types);
+        $model = $this->model;
 
-        if (empty($script['components'])) {
+        if (empty($model->components)) {
             return [];
         }
 
-        if (!is_array($script['components'])) {
+        if (!is_array($model->components)) {
             return [];
         }
 
         $components = [];
 
-        foreach ($script['components'] as $key => $file) {
+        foreach ($model->components as $key => $file) {
             if (is_numeric($key)) {
                 $key = pathinfo($file, PATHINFO_FILENAME);
             }
 
-            $reg = '/<\s*' . $key . '([^>]*)>(?:(.*?)<\s*\/\s*' . $key .'>|)/';
-            $data = [];
-
-            // Extra props attributes.
-            if (preg_match_all($reg, $types['template'], $matches)) {
-                foreach ($matches[1] as $attribute) {
-                    $attribute = str_replace(' /', '', $attribute);
-                    $attribute = trim($attribute);
-
-                    if (preg_match('/(.+)\=\"([^"]*)\"/', $attribute, $matches2)) {
-                        $data[$matches2[1]] = $matches2[2];
-                    }
-                }
-            }
-
-            $components[$key] = $this->render($file, $data);
+            $components[$key] = $this->render($file, $this->attributes($key, $types['template']));
         }
 
         return $components;
     }
 
     /**
-     * Extra from types array.
-     *
-     * @param  array $types
+     * Get data from model file.
      *
      * @return mixed
      */
-    protected function data($types)
+    protected function data()
     {
-        $data = $this->script($types);
+        $model = $this->model;
         
-        if (empty($data['data'])) {
+        if (empty($model->data)) {
             return [];
         }
 
-        if (is_array($data['data'])) {
-            return $data['data'];
+        if (is_array($model->data)) {
+            return $model->data;
         }
 
-        if (is_callable($data['data'])) {
-            $data = $data['data']();
+        if (is_callable($model->data)) {
+            $model = call_user_func($model->data);
         }
         
-        if (is_array($data)) {
-            return $data;
+        if (is_array($model)) {
+            return $model;
         }
 
         return [];
@@ -126,7 +144,8 @@ class Rain
      */
     protected function file($file)
     {
-        $dir = rtrim($this->options['dir'], '/') . '/';
+        $dir = rtrim($this->options['src_dir'], '/') . '/';
+        $file = ltrim($file, '/');
         
         if (strpos($file, $dir) !== false) {
             return $file;
@@ -160,20 +179,29 @@ class Rain
      */
     public function render($file, array $data = [])
     {
-        $this->reset();
+        $filepath = $this->file($file);
 
-        $this->file = $file = $this->file($file);
-
-        if (!file_exists($file)) {
+        if (!file_exists($filepath)) {
             return;
         }
-        
-        $contents = file_get_contents($file);
+
+        if ($cache = $this->cache->get($file, filemtime($filepath))) {
+            return $cache;
+        }
+
+        $this->model = $this->model($file);
+        $contents = file_get_contents($filepath);
 
         $types = [
             'template' => '',
-            'script' => '',
-            'style' => '',
+            'script'   => '',
+            'style'    => '',
+        ];
+
+        $attributes = [
+            'template' => [],
+            'script'   => [],
+            'style'    => [],
         ];
 
         $type = '';
@@ -184,16 +212,28 @@ class Rain
             foreach (array_keys($types) as $key) {
                 // Find first line with a type tag.
                 if (preg_match('/<\s*' . $key . '[^>]*>/', $line)) {
+                    $attributes[$key] = $this->attributes($key, $line);
                     $type = $key;
 
+                    // Use src file instead of new line.
+                    if (isset($attributes[$key]['src'])) {
+                        $type = '';
+                        $src = $attributes[$key]['src'];
+                        unset($attributes[$key]['src']);
+
+                        if (file_exists($this->file($src))) {
+                            $types[$key] = file_get_contents($this->file($src));
+                        }
+                    }
+
                     // Find scoped style tags.
-                    if (!$scoped && preg_match('/\<style(?:.+|)scoped(?:.+|)\>/', $line)) {
+                    if ($key === 'style' && isset($attributes[$key]['scoped']) && $attributes[$key]['scoped']) {
                         $scoped = true;
                     }
 
                     continue 2;
-                
-                // Find last line with a type tag.
+
+                    // Find last line with a type tag.
                 } elseif (preg_match('/<\s*\/\s*' . $key . '>/', $line)) {
                     $type = '';
                     continue 2;
@@ -208,8 +248,7 @@ class Rain
         }
 
         // Generate component id.
-        $id = $this->id($file);
-        $script = $this->script($types);
+        $id = $this->id($filepath);
 
         // Remove any prop- prefixes.
         foreach ($data as $key => $value) {
@@ -218,25 +257,36 @@ class Rain
             $data[$key] = $value;
         }
 
-        $data = array_merge($this->data($types), $data);
+        $data = array_merge($this->data(), $data);
 
         // Create template html.
         $template = (new Template([
-            'content' => $types['template'],
-            'id'      => $id,
-            'methods' => $script['methods'],
-            'scoped'  => $scoped,
+            'attributes' => $attributes['template'],
+            'content'    => $types['template'],
+            'id'         => $id,
+            'methods'    => $this->model->methods,
+            'scoped'     => $scoped,
         ]))->render($data);
 
         $template = $this->renderComponents($template, $types);
 
+        // Append JavaScript html.
+        $template .= (new Script([
+            'attributes' => $attributes['script'],
+            'content'    => $types['script'],
+            'id'         => $id,
+        ]))->render();
+
         // Append style html.
         $template .= (new Style([
-            'content' => $types['style'],
-            'id'      => $id,
-            'scoped'  => $scoped,
+            'attributes' => $attributes['style'],
+            'content'    => $types['style'],
+            'id'         => $id,
+            'scoped'     => $scoped,
         ]))->render();
-        
+
+        $this->cache->set($file, $template);
+
         return $template;
     }
 
@@ -263,33 +313,20 @@ class Rain
     }
 
     /**
-     * Reset properties.
-     */
-    protected function reset() {
-        $this->script = null;
-    }
-
-    /**
-     * Eval script.
+     * Load php model code.
      *
-     * @param  array $types
+     * @param  string $file
      *
      * @return mixed
      */
-    protected function script($types)
+    protected function model($file)
     {
-        if (!empty($this->script)) {
-            return $this->script;
-        }
+        ob_start();
+        $result = require_once $this->file($file);
+        ob_end_clean();
 
-        $result = require $this->file;
-        if (empty($result) || !is_array($result)) {
-            $script = $types['script'];
-            $result = eval($script);
-
-            if (!is_array($result)) {
-                $result = [];
-            }
+        if (!is_array($result)) {
+            $result = [];
         }
 
         $defaults = [
@@ -301,8 +338,6 @@ class Rain
 
         $result = array_merge($defaults, $result);
 
-        $this->script = $result;
-
-        return $result;
+        return (object) $result;
     }
 }

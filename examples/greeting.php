@@ -1,11 +1,6 @@
-<template>
-    <p>{{ greeting }} World!</p>
-    <image />
-    <form greeting="{{ greeting }}" />
-    <p>UniqID ID is {{ uniqid() }}</p>
-</template>
+<template src="greeting.twig" />
 
-<script>
+<?php
     return [
         'data' => function() {
             return [
@@ -22,6 +17,10 @@
             }
         ]
     ];
+?>
+
+<script>
+    document.body.style.backgroundColor = 'red';
 </script>
 
 <style scoped>

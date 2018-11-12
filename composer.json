@@ -1,6 +1,6 @@
 {
     "name": "frozzare/rain",
-    "description": "PHP components that looks like Vue components",
+    "description": "Create PHP components",
     "autoload": {
         "psr-4": {
             "Frozzare\\Rain\\": "src/"

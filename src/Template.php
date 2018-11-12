@@ -14,10 +14,11 @@ class Template
      * @var array
      */
     protected $options = [
-        'content' => '',
-        'id' => '',
-        'methods' => [],
-        'scoped'  => false,
+        'attributes' => [],
+        'content'    => '',
+        'id'         => '',
+        'methods'    => [],
+        'scoped'     => false,
     ];
 
     /**
@@ -34,10 +35,11 @@ class Template
      */
     public function __construct($options)
     {
+        $options = is_array($options) ? $options : [];
         $this->options = array_merge($this->options, $options);
 
         $loader = new Twig_Loader_Array([
-            'file.rain' => $this->options['content'],
+            'component.rain' => $this->options['content'],
         ]);
 
         $this->twig = new Twig_Environment($loader);
@@ -60,7 +62,7 @@ class Template
      */
     public function render($data = [])
     {
-        $html = $this->twig->render('file.rain', $data);
+        $html = $this->twig->render('component.rain', $data);
 
         if ($this->options['scoped']) {
             $html = sprintf('<div id="%s">%s</div>', $this->options['id'], $html);

@@ -4,7 +4,7 @@
     </p>
 </template>
 
-<script>
+<?php
     return [
         'data' => function() {
             return [
@@ -12,7 +12,7 @@
             ];
         }
     ];
-</script>
+?>
 
 <style>
     img {
