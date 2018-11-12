@@ -49,6 +49,12 @@ class Script
             $attr_html .= sprintf('%s="%s" ', $key, $value);
         }
 
-        return sprintf('<script %s>%s</script>', $attr_html, $this->options['content']);
+        $content = $this->options['content'];
+
+        if (empty($content)) {
+            return '';
+        }
+
+        return sprintf('<script %s>%s</script>', $attr_html, $content);
     }
 }

@@ -1,3 +1,4 @@
 index.php
 cache
+composer.lock
 vendor

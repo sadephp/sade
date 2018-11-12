@@ -330,7 +330,7 @@ class Rain
     protected function model($file)
     {
         ob_start();
-        $result = require_once $this->file($file);
+        $result = require $this->file($file);
         ob_end_clean();
 
         if (!is_array($result)) {

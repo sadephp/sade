@@ -67,6 +67,12 @@ class Style
             }
         }
 
-        return sprintf('<style %s>%s</style>', $attr_html, $css->render());
+        $content = $css->render();
+
+        if (empty($content)) {
+            return '';
+        }
+
+        return sprintf('<style %s>%s</style>', $attr_html, $content);
     }
 }
