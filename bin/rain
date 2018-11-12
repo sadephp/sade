@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$rain = new \Frozzare\Rain\Rain(__DIR__);
+$argv = array_slice($argv, 1);
+
+foreach ($argv as $file) {
+    print_r($rain->render($file));
+}
+
+echo "\n";

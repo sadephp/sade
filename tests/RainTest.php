@@ -13,7 +13,6 @@ class RainTest extends TestCase
     public function testRender()
     {
         $output = $this->rain->render('hello.php');
-        $output = trim($output);
 
         $this->assertSame('<p>Hello, world!</p>', $output);
     }

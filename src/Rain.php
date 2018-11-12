@@ -278,6 +278,11 @@ class Rain
         $type = '';
         $scoped = $this->options['style']['scoped'];
 
+        // Extract additional directories.
+        $dirs = explode('/', $file);
+        $dirs = array_slice($dirs, 0, count($dirs) -1);
+        $dirs = implode('/', $dirs);
+
         // Find template, script and style tags.
         foreach (explode("\n", $contents) as $line) {
             foreach (array_keys($types) as $key) {
@@ -291,6 +296,11 @@ class Rain
                         $type = '';
                         $src = $attributes[$key]['src'];
                         unset($attributes[$key]['src']);
+
+                        // Add additional directories.
+                        if (strpos($src, $dirs . '/') === false) {
+                            $src = implode('/', [$dirs, $src]);
+                        }
 
                         if (file_exists($this->file($src))) {
                             $types[$key] = file_get_contents($this->file($src));
@@ -355,6 +365,8 @@ class Rain
             'id'         => $id,
             'scoped'     => $scoped,
         ]))->render();
+
+        $template = trim($template);
 
         $this->cache->set($file, $template);
 
