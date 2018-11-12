@@ -2,6 +2,8 @@
 
 namespace Frozzare\Rain;
 
+use Closure;
+
 class Rain
 {
     /**
@@ -186,6 +188,58 @@ class Rain
     }
 
     /**
+     * Get methods from model file.
+     *
+     * @param  array $data
+     * 
+     * @return array
+     */
+    protected function methods(array $data) {
+        $methods = $this->model->methods;
+        $data = (object) $data;
+
+        foreach ($methods as $key => $method) {
+            if (!is_callable($method)) {
+                unset($methods[$key]);
+                continue;
+            }
+
+            $methods[$key] = Closure::bind($method, $data);
+        }
+
+        return $methods;
+    }
+
+    /**
+     * Load php model code.
+     *
+     * @param  string $file
+     *
+     * @return mixed
+     */
+    protected function model($file)
+    {
+        ob_start();
+        $result = require $this->file($file);
+        ob_end_clean();
+
+        if (!is_array($result)) {
+            $result = [];
+        }
+
+        $defaults = [
+            'data' => function () {
+            },
+            'components' => [],
+            'methods' => [],
+        ];
+
+        $result = array_merge($defaults, $result);
+
+        return (object) $result;
+    }
+
+    /**
      * Render component file.
      *
      * @param  string $file
@@ -280,7 +334,7 @@ class Rain
             'attributes' => $attributes['template'],
             'content'    => $types['template'],
             'id'         => $id,
-            'methods'    => $this->model->methods,
+            'methods'    => $this->methods($data),
             'scoped'     => $scoped,
         ]))->render($data);
 
@@ -326,34 +380,5 @@ class Rain
         }
 
         return $template;
-    }
-
-    /**
-     * Load php model code.
-     *
-     * @param  string $file
-     *
-     * @return mixed
-     */
-    protected function model($file)
-    {
-        ob_start();
-        $result = require $this->file($file);
-        ob_end_clean();
-
-        if (!is_array($result)) {
-            $result = [];
-        }
-
-        $defaults = [
-            'data' => function () {
-            },
-            'components' => [],
-            'methods' => [],
-        ];
-
-        $result = array_merge($defaults, $result);
-
-        return (object) $result;
     }
 }

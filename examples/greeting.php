@@ -12,8 +12,8 @@
             'form.php',
         ],
         'methods' => [
-            'uniqid' => function() {
-                return uniqid();
+            'name' => function() {
+                return sprintf('%s Sandra!', $this->greeting);
             }
         ]
     ];
