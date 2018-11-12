@@ -42,6 +42,10 @@ class Script
             $attributes['type'] = 'text/javascript';
         }
 
+        if (empty($attributes['data-rain-id'])) {
+            $attributes['data-rain-id'] = $this->options['id'];
+        }
+
         $attr_html = '';
 
         foreach ($attributes as $key => $value) {
