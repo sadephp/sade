@@ -64,10 +64,18 @@ class Rain
                 $attribute = str_replace(' /', '', $attribute);
                 $attribute = trim($attribute);
 
-                if (preg_match('/(.+)\=\"([^"]*)\"/', $attribute, $matches2)) {
-                    $name = explode(' ', $matches2[1]);
-                    $name = array_pop($name);
-                    $data[$name] = $matches2[2];
+                if (preg_match_all('/(?:([^\s=]+)\s*=\s*(\'[^<\']*\'|\"[^<"]*\")|\w+)/', $attribute, $matches2)) {
+                    foreach ($matches2[1] as $index => $name) {
+                        if (empty($name)) {
+                            $name = $matches2[0][$index];
+                            $value = '';
+                        } else {
+                            $value = $matches2[2][$index];
+                            $value = substr($value, 1, strlen($value)-2);
+                        }
+
+                        $data[$name] = $value;
+                    }
                 }
             }
         }
