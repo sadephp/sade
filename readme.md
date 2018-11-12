@@ -65,6 +65,12 @@ $rain = new \Frozzare\Rain\Rain(__DIR__ . '/examples', [
 echo $rain->render('greeting.php');
 ```
 
+## CLI usage
+
+```
+vendor/bin/rain path/to/component.php > component.html
+```
+
 ## License
 
 MIT © [Fredrik Forsmo](https://github.com/frozzare)
