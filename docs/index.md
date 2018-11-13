@@ -45,6 +45,8 @@ Default options:
 $sade = new \Sade\Sade( __DIR__ . '/path/to/components', $options );
 ```
 
+You can always change options using `$sade->options` and it will return a new instance of Sade class.
+
 ## Render method
 
 To render a Sade component you create a new instanceof the `\Sade\Sade` class with the source directory where you're components exists. If no directory is given then `getcwd()` will be used.
@@ -55,6 +57,12 @@ Example:
 $sade = new \Sade\Sade( __DIR__ . '/path/to/components' );
 
 echo $sade->render('greeting.php');
+```
+
+To only render one of the type tags (template, script or style):
+
+```php
+echo $sade->only('script')->render('greeting.php');
 ```
 
 ## Sade CLI 
