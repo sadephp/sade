@@ -99,6 +99,8 @@ Example:
 <style src="accordion.css" />
 ```
 
+If the `src` attribute starts with `//` or `http://` or `https://` it will just add a normal script or style tag.
+
 ### Template tag
 
 The template tag contains [Twig](https://twig.symfony.com/doc/2.x/) (2.x) code and are compiled to HTML at runtime and cached if configured.

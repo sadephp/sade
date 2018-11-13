@@ -342,6 +342,9 @@ class Sade
         // Store parent dirs.
         $this->dir = implode('/', [$this->dir, $dirs]);
 
+        // Regex for testing if a src starts with // or http[s]://.
+        $urlStartReg = '/^(?:\/\/|(http(s?))\:\/\/)/';
+
         // Find template, script and style tags.
         foreach (array_keys($types) as $key) {
             $reg = '/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/is';
@@ -356,6 +359,11 @@ class Sade
             if (count($matches) === 1 || empty($matches[1])) {
                 if (isset($attributes[$key]['src'])) {
                     $src = $attributes[$key]['src'];
+
+                    if (preg_match($urlStartReg, $src)) {
+                        continue;
+                    }
+
                     unset($attributes[$key]['src']);
 
                     if (file_exists($this->file($src))) {

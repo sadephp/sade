@@ -59,7 +59,7 @@ class Script
 
         $content = $this->options['content'];
 
-        if (empty($content)) {
+        if (empty($content) && !isset($attributes['src'])) {
             return '';
         }
 

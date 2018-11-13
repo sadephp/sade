@@ -71,7 +71,7 @@ class Style
 
         $content = $css->render();
 
-        if (empty($content)) {
+        if (empty($content) && !isset($attributes['src'])) {
             return '';
         }
 
