@@ -19,6 +19,13 @@ class Sade
     protected $dir = '';
 
     /**
+     * File directory.
+     *
+     * @var string
+     */
+    protected $fileDir = '';
+
+    /**
      * Sade options.
      *
      * @var array
@@ -50,7 +57,6 @@ class Sade
      */
     public function __construct($dir = '', array $options = [])
     {
-
         $this->setupDir($dir);
         $this->options($options);
 
@@ -233,7 +239,7 @@ class Sade
      */
     protected function file($file)
     {
-        $dir = rtrim($this->dir, '/') . '/';
+        $dir = rtrim($this->fileDir, '/') . '/';
         $file = ltrim($file, '/');
 
         if (strpos($file, $dir) !== false) {
@@ -396,6 +402,16 @@ class Sade
      */
     public function render($file, array $model = [])
     {
+        // Store additional directories.
+        $dirs = explode('/', $file);
+        $dirs = array_slice($dirs, 0, count($dirs) -1);
+        $dirs = implode('/', $dirs);
+        $this->fileDir = implode('/', [$this->dir, $dirs]);
+
+        // Remove any path in file.
+        $file = explode('/', $file);
+        $file = array_pop($file);
+
         $filepath = $this->file($file);
 
         if (!file_exists($filepath)) {
@@ -410,12 +426,6 @@ class Sade
         }
 
         $this->model = $this->parent['model'] = $this->model($file, $model);
-
-        // Store additional directories.
-        $dirs = explode('/', $file);
-        $dirs = array_slice($dirs, 0, count($dirs) -1);
-        $dirs = implode('/', $dirs);
-        $this->dir = implode('/', [$this->dir, $dirs]);
 
         // Find attributes and types.
         list($attributes, $types) = $this->parseFileContent(file_get_contents($filepath));
@@ -508,6 +518,6 @@ class Sade
             $dir = rtrim($cwd, '/') . '/' . ltrim($dir, '/');
         }
 
-        $this->dir = $dir;
+        $this->dir = $this->fileDir = $dir;
     }
 }
