@@ -96,7 +96,7 @@ Example:
 ```html
 <template src="accordion.twig" />
 <script src="accordion.js" />
-<style scoped src="accordion.css" />
+<style src="accordion.css" />
 ```
 
 ### Template tag
