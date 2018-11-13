@@ -123,7 +123,7 @@ Example:
 <style src="accordion.css" />
 ```
 
-If the `src` attribute starts with `//` or `http://` or `https://` it will just add a normal script or style tag.
+If the `src` attribute starts with `//` or `http://` or `https://` it will render a normal script or style tag.
 
 ### Template tag
 
