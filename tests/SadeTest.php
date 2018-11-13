@@ -1,6 +1,6 @@
 <?php
 
-use Sade;
+use Sade\Sade;
 use PHPUnit\Framework\TestCase;
 
 class SadeTest extends TestCase
