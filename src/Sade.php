@@ -438,7 +438,8 @@ class Sade
      *
      * @param string $dir
      */
-    protected function setupDir($dir) {
+    protected function setupDir($dir)
+    {
         $cwd = getcwd();
 
         if (!is_string($dir) || empty($dir)) {
