@@ -379,6 +379,7 @@ class Sade
         $template = (new Template([
             'attributes' => $attributes['template'],
             'content'    => $types['template'],
+            'filters'    => $this->model->filters,
             'id'         => $id,
             'methods'    => $this->methods($data),
             'scoped'     => $scoped ? $scoped : $this->options['template']['scoped'],
