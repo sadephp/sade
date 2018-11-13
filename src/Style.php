@@ -15,14 +15,8 @@ class Style
         'attributes' => [],
         'content'    => '',
         'id'         => '',
+        'scoped'     => false,
     ];
-
-    /**
-     * CSS Parser
-     *
-     * @var \Sabberworm\CSS\Parser
-     */
-    protected $parser;
 
     /**
      * Style construct.
@@ -32,7 +26,6 @@ class Style
     public function __construct(array $options = [])
     {
         $this->options = array_merge($this->options, $options);
-        $this->parser = new Parser($this->options['content']);
     }
 
     /**
@@ -52,17 +45,27 @@ class Style
             $attributes['type'] = 'text/css';
         }
 
+        if (isset($attributes['scoped'])) {
+            unset($attributes['scoped']);
+        }
+
         $attr_html = '';
 
         foreach ($attributes as $key => $value) {
-            $attr_html .= sprintf('%s="%s" ', $key, $value);
+            if (empty($value)) {
+                $attr_html .= sprintf('%s ', $key);
+            } else {
+                $attr_html .= sprintf('%s="%s" ', $key, $value);
+            }
         }
 
-        $css = $this->parser->parse();
+        $css = (new Parser($this->options['content']))->parse();
 
-        foreach ($css->getAllDeclarationBlocks() as $block) {
-            foreach ($block->getSelectors() as $selector) {
-                $selector->setSelector('#' . $this->options['id'] . ' ' . $selector->getSelector());
+        if ($this->options['scoped']) {
+            foreach ($css->getAllDeclarationBlocks() as $block) {
+                foreach ($block->getSelectors() as $selector) {
+                    $selector->setSelector('#' . $this->options['id'] . ' ' . $selector->getSelector());
+                }
             }
         }
 

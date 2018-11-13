@@ -13,6 +13,7 @@ class Script
         'attributes' => [],
         'content'    => '',
         'id'         => '',
+        'scoped'     => false,
     ];
 
     /**
@@ -42,14 +43,18 @@ class Script
             $attributes['type'] = 'text/javascript';
         }
 
-        if (empty($attributes['data-sade-id'])) {
+        if ($this->options['scoped'] && empty($attributes['data-sade-id'])) {
             $attributes['data-sade-id'] = $this->options['id'];
         }
 
         $attr_html = '';
 
         foreach ($attributes as $key => $value) {
-            $attr_html .= sprintf('%s="%s" ', $key, $value);
+            if (empty($value)) {
+                $attr_html .= sprintf('%s ', $key);
+            } else {
+                $attr_html .= sprintf('%s="%s" ', $key, $value);
+            }
         }
 
         $content = $this->options['content'];

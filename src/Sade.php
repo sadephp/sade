@@ -48,7 +48,7 @@ class Sade
      * @param string $dir
      * @param array  $options
      */
-    public function __construct($dir, array $options = [])
+    public function __construct($dir = '', array $options = [])
     {
         $defaults = [
             'cache'    => [
@@ -63,7 +63,8 @@ class Sade
             ],
         ];
 
-        $this->dir = is_string($dir) ? $dir : __DIR__;
+        $this->setupDir($dir);
+
         $this->options = array_merge($defaults, $options);
         $this->cache = new Cache($this->options['cache']);
     }
@@ -277,11 +278,11 @@ class Sade
 
         $defaults = [
             'components' => [],
-            'data' => function () {
+            'data'       => function () {
             },
-            'filters' => [],
-            'methods' => [],
-            'props' => [],
+            'filters'    => [],
+            'methods'    => [],
+            'props'      => [],
         ];
 
         // Prepare model data.
@@ -392,6 +393,7 @@ class Sade
             'attributes' => $attributes['script'],
             'content'    => $types['script'],
             'id'         => $id,
+            'scoped'     => $scoped ? $scoped : $this->options['template']['scoped'],
         ]))->render();
 
         // Append style html.
@@ -429,5 +431,24 @@ class Sade
         }
 
         return $template;
+    }
+
+    /**
+     * Setup components directory.
+     *
+     * @param string $dir
+     */
+    protected function setupDir($dir) {
+        $cwd = getcwd();
+
+        if (!is_string($dir) || empty($dir)) {
+            $dir = $cwd;
+        }
+
+        if (strpos($dir, $cwd) === false) {
+            $dir = rtrim($cwd, '/') . '/' . ltrim($dir, '/');
+        }
+
+        $this->dir = $dir;
     }
 }

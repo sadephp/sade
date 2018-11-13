@@ -99,7 +99,11 @@ class Template
         $attr_html = '';
 
         foreach ($attributes as $key => $value) {
-            $attr_html .= sprintf('%s="%s" ', $key, $value);
+            if (empty($value)) {
+                $attr_html .= sprintf('%s ', $key);
+            } else {
+                $attr_html .= sprintf('%s="%s" ', $key, $value);
+            }
         }
 
         return sprintf('<div %s>%s</div>', $attr_html, $html);
