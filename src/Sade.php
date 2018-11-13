@@ -407,6 +407,16 @@ class Sade
      */
     public function render($file, array $model = [])
     {
+        if (is_array($file)) {
+            $output = '';
+
+            foreach ($file as $item) {
+                $output .= $this->render($item) . "\n";
+            }
+
+            return $output;
+        }
+
         // Store additional directories.
         $dirs = explode('/', $file);
         $dirs = array_slice($dirs, 0, count($dirs) -1);

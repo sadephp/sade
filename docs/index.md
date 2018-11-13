@@ -61,6 +61,12 @@ $sade = new \Sade\Sade( __DIR__ . '/path/to/components' );
 echo $sade->render('greeting.php');
 ```
 
+You can also render a array of files:
+
+```php
+echo $sade->render(['greeting.php', 'greeting.php']);
+```
+
 To only render one of the type tags (template, script or style):
 
 ```php
