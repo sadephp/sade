@@ -1,4 +1,6 @@
-<template>
+<template
+data-attribute="hej"
+>
     <p>{{ greeting }}, world!</p>
 </template>
 

@@ -26,6 +26,16 @@ class Rain
     protected $options = [];
 
     /**
+     * Parent values.
+     *
+     * @var array
+     */
+    protected $parent = [
+        'attributes' => [],
+        'model'      => null,
+    ];
+
+    /**
      * Model value.
      *
      * @var array
@@ -111,20 +121,51 @@ class Rain
             return [];
         }
 
-        if (!is_array($model->components)) {
+        if (! is_array($model->components)) {
             return [];
         }
 
         $components = [];
+        $template   = $types['template'];
 
         foreach ($model->components as $key => $file) {
             if (is_numeric($key)) {
                 $key = pathinfo($file, PATHINFO_FILENAME);
             }
 
-            $components[$key] = $this->render($file, [
-                'data' => $this->attributes($key, $types['template']),
-            ]);
+            $reg = '/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/is';
+            if (!preg_match_all($reg, $template, $matches)) {
+                continue;
+            }
+
+            $nextModel = $this->model($file);
+            $nextData = [];
+
+            // Pass along proprties from parent component if requested.
+            foreach ($nextModel->props as $key) {
+                if (isset($this->parent['attributes'][$key])) {
+                    $nextData[$key] = $this->parent['attributes'][$key];
+                }
+
+                if (isset($model->data[$key])) {
+                    $nextData[$key] = $model->data[$key];
+                }
+            }
+
+            // Render components.
+            foreach ($matches[0] as $index => $before) {
+                $this->parent['attributes'] = $attributes = $this->attributes($key, $before);
+
+                $nextData = array_merge($nextData, $attributes);
+
+                // Append children values.
+                $nextData['children'] = $matches[1][$index];
+
+                // Render child component.
+                $components[$before] = $this->render($file, [
+                    'data' => $nextData,
+                ]);
+            }
         }
 
         return $components;
@@ -150,7 +191,7 @@ class Rain
         if (is_callable($data)) {
             $data = call_user_func($data);
         }
-        
+
         if (is_array($data)) {
             return $data;
         }
@@ -169,11 +210,11 @@ class Rain
     {
         $dir = rtrim($this->dir, '/') . '/';
         $file = ltrim($file, '/');
-        
+
         if (strpos($file, $dir) !== false) {
             return $file;
         }
-        
+
         return $dir . $file;
     }
 
@@ -239,6 +280,7 @@ class Rain
             },
             'components' => [],
             'methods' => [],
+            'props' => [],
         ];
 
         // Prepare model data.
@@ -272,7 +314,7 @@ class Rain
             return $cache;
         }
 
-        $this->model = $this->model($file, $model);
+        $this->model = $this->parent['model'] = $this->model($file, $model);
         $contents = file_get_contents($filepath);
 
         $types = [
@@ -295,49 +337,37 @@ class Rain
         $dirs = array_slice($dirs, 0, count($dirs) -1);
         $dirs = implode('/', $dirs);
 
+        // Store parent dirs.
+        $this->dir = implode('/', [$this->dir, $dirs]);
+
         // Find template, script and style tags.
-        foreach (explode("\n", $contents) as $line) {
-            foreach (array_keys($types) as $key) {
-                // Find first line with a type tag.
-                if (preg_match('/<\s*' . $key . '[^>]*>/', $line)) {
-                    $attributes[$key] = $this->attributes($key, $line);
-                    $type = $key;
+        foreach (array_keys($types) as $key) {
+            $reg = '/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/is';
 
-                    // Use src file instead of new line.
-                    if (isset($attributes[$key]['src'])) {
-                        $type = '';
-                        $src = $attributes[$key]['src'];
-                        unset($attributes[$key]['src']);
-
-                        // Add additional directories.
-                        if (strpos($src, $dirs . '/') === false) {
-                            $src = implode('/', [$dirs, $src]);
-                        }
-
-                        if (file_exists($this->file($src))) {
-                            $types[$key] = file_get_contents($this->file($src));
-                        }
-                    }
-
-                    // Find scoped style tags.
-                    if ($key === 'style' && isset($attributes[$key]['scoped']) && $attributes[$key]['scoped']) {
-                        $scoped = true;
-                    }
-
-                    continue 2;
-
-                    // Find last line with a type tag.
-                } elseif (preg_match('/<\s*\/\s*' . $key . '>/', $line)) {
-                    $type = '';
-                    continue 2;
-                }
-            }
-
-            if (empty($type)) {
+            if (!preg_match($reg, $contents, $matches)) {
                 continue;
             }
 
-            $types[$type] .= $line;
+            $attributes[$key] = $this->attributes($key, $matches[0]);
+
+            // Load source file if found.
+            if (count($matches) === 1 || empty($matches[1])) {
+                if (isset($attributes[$key]['src'])) {
+                    $src = $attributes[$key]['src'];
+                    unset($attributes[$key]['src']);
+
+                    if (file_exists($this->file($src))) {
+                        $types[$key] = file_get_contents($this->file($src));
+                    }
+                }
+            } else {
+                $types[$key] = $matches[1];
+            }
+
+            // Find scoped style tags.
+            if ($key === 'style' && isset($attributes[$key]['scoped'])) {
+                $scoped = true;
+            }
         }
 
         // Generate component id.
@@ -393,7 +423,7 @@ class Rain
 
         // Replace components tags.
         foreach ($components as $key => $html) {
-            $template = preg_replace('/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/', $html, $template);
+            $template = str_replace($key, $html, $template);
         }
 
         return $template;
