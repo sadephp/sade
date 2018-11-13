@@ -26,6 +26,13 @@ class Sade
     protected $fileDir = '';
 
     /**
+     * Model value.
+     *
+     * @var array
+     */
+    protected $model = [];
+
+    /**
      * Sade options.
      *
      * @var array
@@ -43,11 +50,15 @@ class Sade
     ];
 
     /**
-     * Model value.
+     * Component tags.
      *
      * @var array
      */
-    protected $model = [];
+    protected $tags = [
+        'template',
+        'script',
+        'style',
+    ];
 
     /**
      * Sade construct.
@@ -311,7 +322,7 @@ class Sade
      */
     public function only($type)
     {
-        $types = ['template', 'script', 'style'];
+        $types = $this->tags;
         $options = [];
 
         foreach ($types as $key) {
@@ -348,19 +359,13 @@ class Sade
      */
     protected function parseFileContent($contents)
     {
-        $types = [
-            'template' => '',
-            'script'   => '',
-            'style'    => '',
-        ];
+        $attributes = $types = [];
 
-        $attributes = [
-            'template' => [],
-            'script'   => [],
-            'style'    => [],
-        ];
+        foreach ($this->tags as $tag) {
+            $attributes[$tag] = [];
+            $types[$tag] = '';
+        }
 
-        $type = '';
         // Regex for testing if a src starts with // or http[s]://.
         $urlStartReg = '/^(?:\/\/|(http(s?))\:\/\/)/';
 
@@ -562,5 +567,20 @@ class Sade
         ];
 
         $this->options = new Config(array_replace_recursive($defaults, $options));
+    }
+
+    /**
+     * Call dynamic methods.
+     *
+     * @param  string $method
+     * @param  mixed  $parameters
+     *
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (in_array($method, $this->tags, true)) {
+            return $this->only($method)->render($parameters);
+        }
     }
 }

@@ -71,6 +71,9 @@ To only render one of the type tags (template, script or style):
 
 ```php
 echo $sade->only('script')->render('greeting.php');
+
+// or call magic methods (template, script or style):
+echo $sade->script('greeting.php');
 ```
 
 ## Sade CLI 
