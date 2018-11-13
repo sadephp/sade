@@ -7,7 +7,7 @@ class SadeTest extends TestCase
 {
     public function setUp()
     {
-        $this->sade = new Sade('testdata');
+        $this->sade = new Sade(__DIR__ . '/testdata');
     }
 
     public function testRender()

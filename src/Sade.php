@@ -108,6 +108,30 @@ class Sade
     }
 
     /**
+     * Bind data to functions.
+     *
+     * @param  array $funcs
+     * @param  array $data
+     *
+     * @return array
+     */
+    protected function bindData(array $funcs, array $data)
+    {
+        $data = (object) $data;
+
+        foreach ($funcs as $key => $func) {
+            if (!is_callable($func)) {
+                unset($funcs[$key]);
+                continue;
+            }
+
+            $func[$key] = Closure::bind($func, $data);
+        }
+
+        return $funcs;
+    }
+
+    /**
      * Render components.
      *
      * @param  array $types
@@ -235,30 +259,6 @@ class Sade
     }
 
     /**
-     * Get methods from model file.
-     *
-     * @param  array $data
-     *
-     * @return array
-     */
-    protected function methods(array $data)
-    {
-        $methods = $this->model->methods;
-        $data = (object) $data;
-
-        foreach ($methods as $key => $method) {
-            if (!is_callable($method)) {
-                unset($methods[$key]);
-                continue;
-            }
-
-            $methods[$key] = Closure::bind($method, $data);
-        }
-
-        return $methods;
-    }
-
-    /**
      * Load php model code.
      *
      * @param  string $file
@@ -380,9 +380,9 @@ class Sade
         $template = (new Template([
             'attributes' => $attributes['template'],
             'content'    => $types['template'],
-            'filters'    => $this->model->filters,
+            'filters'    => $this->bindData($this->model->filters, $data),
             'id'         => $id,
-            'methods'    => $this->methods($data),
+            'methods'    => $this->bindData($this->model->methods, $data),
             'scoped'     => $scoped ? $scoped : $this->options['template']['scoped'],
         ]))->render($data);
 
