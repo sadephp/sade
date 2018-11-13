@@ -16,6 +16,7 @@ class Template
     protected $options = [
         'attributes' => [],
         'content'    => '',
+        'filters'    => [],
         'id'         => '',
         'methods'    => [],
         'scoped'     => false,
@@ -37,12 +38,30 @@ class Template
     {
         $this->options = array_merge($this->options, $options);
 
-        $loader = new Twig_Loader_Array([
-            'component.sade' => $this->options['content'],
-        ]);
+        $this->setupTwig();
+        $this->registerFilters();
+        $this->registerMethods();
+    }
 
-        $this->twig = new Twig_Environment($loader);
+    /**
+     * Register filters.
+     */
+    protected function registerFilters()
+    {
+        foreach ($this->options['filters'] as $key => $value) {
+            if (!is_callable($value)) {
+                continue;
+            }
 
+            $this->twig->addFilter(new Twig_Filter($key, $value));
+        }
+    }
+
+    /**
+     * Register methods.
+     */
+    protected function registerMethods()
+    {
         foreach ($this->options['methods'] as $key => $value) {
             if (!is_callable($value)) {
                 continue;
@@ -84,5 +103,17 @@ class Template
         }
 
         return sprintf('<div %s>%s</div>', $attr_html, $html);
+    }
+
+    /**
+     * Setup twig.
+     */
+    protected function setupTwig()
+    {
+        $loader = new Twig_Loader_Array([
+            'component.sade' => $this->options['content'],
+        ]);
+
+        $this->twig = new Twig_Environment($loader);
     }
 }

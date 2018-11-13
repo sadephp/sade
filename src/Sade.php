@@ -276,9 +276,10 @@ class Sade
         }
 
         $defaults = [
+            'components' => [],
             'data' => function () {
             },
-            'components' => [],
+            'filters' => [],
             'methods' => [],
             'props' => [],
         ];
