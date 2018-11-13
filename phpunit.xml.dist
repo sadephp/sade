@@ -9,7 +9,7 @@
 	processIsolation="false"
 	>
 	<testsuites>
-		<testsuite name="Rain">
+		<testsuite name="Sade">
 			<directory suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>

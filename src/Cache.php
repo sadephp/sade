@@ -1,6 +1,6 @@
 <?php
 
-namespace Frozzare\Rain;
+namespace Sade;
 
 class Cache
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Frozzare\Rain;
+namespace Sade;
 
 class Script
 {
@@ -42,8 +42,8 @@ class Script
             $attributes['type'] = 'text/javascript';
         }
 
-        if (empty($attributes['data-rain-id'])) {
-            $attributes['data-rain-id'] = $this->options['id'];
+        if (empty($attributes['data-sade-id'])) {
+            $attributes['data-sade-id'] = $this->options['id'];
         }
 
         $attr_html = '';

@@ -1,10 +1,10 @@
 <?php
 
-namespace Frozzare\Rain;
+namespace Sade;
 
 use Closure;
 
-class Rain
+class Sade
 {
     /**
      * Cache instance.
@@ -19,7 +19,7 @@ class Rain
     protected $dir = '';
 
     /**
-     * Rain options.
+     * Sade options.
      *
      * @var array
      */
@@ -43,7 +43,7 @@ class Rain
     protected $model = [];
 
     /**
-     * Rain construct.
+     * Sade construct.
      *
      * @param string $dir
      * @param array  $options
@@ -219,7 +219,7 @@ class Rain
     }
 
     /**
-     * Generate rain id.
+     * Generate Sade id.
      *
      * @param  string $file
      *
@@ -230,7 +230,7 @@ class Rain
         $file = $this->file($file);
         $id = substr(base64_encode($file), 0, 12);
 
-        return 'rain-' . strtolower($id);
+        return 'sade-' . strtolower($id);
     }
 
     /**

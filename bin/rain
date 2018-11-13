@@ -4,11 +4,11 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-$rain = new \Frozzare\Rain\Rain(__DIR__);
+$sade = new \Sade\Sade(__DIR__);
 $argv = array_slice($argv, 1);
 
 foreach ($argv as $file) {
-    print_r($rain->render($file));
+    print_r($sade->render($file));
 }
 
 echo "\n";

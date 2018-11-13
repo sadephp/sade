@@ -1,8 +1,8 @@
-# Rain
+# Sade
 
 > Work in progress!
 
-Rain, a library for creating PHP Components with [Twig](https://twig.symfony.com/doc/2.x/) (2.x). This package will not do any preprocessing or somthing like that.
+Sade, a library for creating PHP Components with [Twig](https://twig.symfony.com/doc/2.x/) (2.x). This package will not do any preprocessing or somthing like that.
 
 ## Example
 
@@ -55,20 +55,20 @@ Multiple files:
 To render
 
 ```php
-$rain = new \Frozzare\Rain\Rain(__DIR__ . '/examples', [
+$sade = new \Sade\Sade(__DIR__ . '/examples', [
     'style' => [
         // Force scoped style.
         'scoped' => true
     ]
 ]);
 
-echo $rain->render('greeting.php');
+echo $sade->render('greeting.php');
 ```
 
 ## CLI usage
 
 ```
-vendor/bin/rain path/to/component.php > component.html
+vendor/bin/sade path/to/component.php > component.html
 ```
 
 ## License

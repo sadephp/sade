@@ -1,6 +1,6 @@
 <?php
 
-namespace Frozzare\Rain;
+namespace Sade;
 
 use Twig_Environment;
 use Twig_Function;
@@ -38,7 +38,7 @@ class Template
         $this->options = array_merge($this->options, $options);
 
         $loader = new Twig_Loader_Array([
-            'component.rain' => $this->options['content'],
+            'component.sade' => $this->options['content'],
         ]);
 
         $this->twig = new Twig_Environment($loader);
@@ -61,7 +61,7 @@ class Template
      */
     public function render($data = [])
     {
-        $html = $this->twig->render('component.rain', $data);
+        $html = $this->twig->render('component.sade', $data);
 
         if (!$this->options['scoped']) {
             return $html;

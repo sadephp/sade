@@ -1,5 +1,5 @@
 {
-    "name": "frozzare/rain",
+    "name": "sadephp/sade",
     "description": "Create PHP components",
     "license": "MIT",
     "keywords": [
@@ -9,7 +9,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Frozzare\\Rain\\": "src/"
+            "Sade\\": "src/"
         }
     },
     "require": {
@@ -22,5 +22,5 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "bin": ["bin/rain"]
+    "bin": ["bin/sade"]
 }
