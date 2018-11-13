@@ -50,27 +50,10 @@ class Sade
      */
     public function __construct($dir = '', array $options = [])
     {
-        $defaults = [
-            'cache'    => [
-                'dir'  => '',
-                'perm' => ( 0755 & ~ umask() ),
-            ],
-            'script'   => [
-                'enabled' => true,
-            ],
-            'style'    => [
-                'enabled' => true,
-                'scoped'  => false
-            ],
-            'template' => [
-                'enabled' => true,
-                'scoped'  => false
-            ],
-        ];
 
         $this->setupDir($dir);
+        $this->options($options);
 
-        $this->options = new Config(array_merge($defaults, $options));
         $this->cache = new Cache($this->options['cache']);
     }
 
@@ -134,6 +117,18 @@ class Sade
         }
 
         return $funcs;
+    }
+
+    /**
+     * Determine if cache is enabled or not.
+     *
+     * @return bool
+     */
+    protected function cacheEnabled()
+    {
+        return $this->options->get('template.enabled', true) &&
+            $this->options->get('script.enabled', true) &&
+            $this->options->get('style.enabled', true);
     }
 
     /**
@@ -230,18 +225,6 @@ class Sade
     }
 
     /**
-     * Determine if cache is enabled or not.
-     *
-     * @return bool
-     */
-    protected function cacheEnabled()
-    {
-        return $this->options->get('template.enabled', true) &&
-            $this->options->get('script.enabled', true) &&
-            $this->options->get('style.enabled', true);
-    }
-
-    /**
      * Get component file with directory.
      *
      * @param  string $file
@@ -314,13 +297,45 @@ class Sade
     }
 
     /**
-     * Extra attributes and types from a string.
+     * Set options.
+     *
+     * @param  array $options
+     *
+     * @return \Sade\Sade
+     */
+    public function options(array $options)
+    {
+        $defaults = [
+            'cache'    => [
+                'dir'  => '',
+                'perm' => ( 0755 & ~ umask() ),
+            ],
+            'script'   => [
+                'enabled' => true,
+            ],
+            'style'    => [
+                'enabled' => true,
+                'scoped'  => false
+            ],
+            'template' => [
+                'enabled' => true,
+                'scoped'  => false
+            ],
+        ];
+
+        $this->options = new Config(array_merge($defaults, $options));
+
+        return $this;
+    }
+
+    /**
+     * Parse file content and extract attributes and types.
      *
      * @param  string $contents
      *
      * @return array
      */
-    protected function extractTypes($contents)
+    protected function parseFileContent($contents)
     {
         $types = [
             'template' => '',
@@ -403,7 +418,7 @@ class Sade
         $this->dir = implode('/', [$this->dir, $dirs]);
 
         // Find attributes and types.
-        list($attributes, $types) = $this->extractTypes(file_get_contents($filepath));
+        list($attributes, $types) = $this->parseFileContent(file_get_contents($filepath));
 
         // Generate component id.
         $id = $this->id($filepath);
