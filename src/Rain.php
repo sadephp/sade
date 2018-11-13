@@ -41,16 +41,19 @@ class Rain
     public function __construct($dir, array $options = [])
     {
         $defaults = [
-            'cache'   => [
+            'cache'    => [
                 'dir'  => '',
                 'perm' => ( 0755 & ~ umask() ),
             ],
-            'style'   => [
+            'style'    => [
+                'scoped' => false
+            ],
+            'template' => [
                 'scoped' => false
             ],
         ];
 
-        $this->dir = $dir;
+        $this->dir = is_string($dir) ? $dir : __DIR__;
         $this->options = array_merge($defaults, $options);
         $this->cache = new Cache($this->options['cache']);
     }
@@ -346,7 +349,7 @@ class Rain
             'content'    => $types['template'],
             'id'         => $id,
             'methods'    => $this->methods($data),
-            'scoped'     => $scoped,
+            'scoped'     => $scoped ? $scoped : $this->options['template']['scoped'],
         ]))->render($data);
 
         $template = $this->renderComponents($template, $types);

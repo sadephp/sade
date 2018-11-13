@@ -63,10 +63,26 @@ class Template
     {
         $html = $this->twig->render('component.rain', $data);
 
-        if ($this->options['scoped']) {
-            $html = sprintf('<div id="%s">%s</div>', $this->options['id'], $html);
+        if (!$this->options['scoped']) {
+            return $html;
         }
 
-        return $html;
+        $attributes = $this->options['attributes'];
+
+        if (!is_array($attributes)) {
+            $attributes = [];
+        }
+
+        if (empty($attributes['id'])) {
+            $attributes['id'] = $this->options['id'];
+        }
+
+        $attr_html = '';
+
+        foreach ($attributes as $key => $value) {
+            $attr_html .= sprintf('%s="%s" ', $key, $value);
+        }
+
+        return sprintf('<div %s>%s</div>', $attr_html, $html);
     }
 }
