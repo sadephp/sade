@@ -46,4 +46,11 @@ class SadeTest extends TestCase
 
         $this->assertTrue(strpos($output, '<div') !== false && strpos($output, '<script') !== false && strpos($output, '<style') !== false);
     }
+
+    public function testOnlyRender()
+    {
+        $output = $this->sade->only('script')->render('accordion/accordion.php');
+
+        $this->assertTrue(strpos($output, '<div') === false && strpos($output, '<script') !== false && strpos($output, '<style') === false);
+    }
 }

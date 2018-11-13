@@ -58,9 +58,9 @@ class Sade
     public function __construct($dir = '', array $options = [])
     {
         $this->setupDir($dir);
-        $this->options($options);
+        $this->setupOptions($options);
 
-        $this->cache = new Cache($this->options['cache']);
+        $this->cache = new Cache($this->options->get('cache'));
     }
 
     /**
@@ -187,7 +187,7 @@ class Sade
             foreach ($matches[0] as $index => $before) {
                 $this->parent['attributes'] = $attributes = $this->attributes($key, $before);
 
-                $nextData = array_merge($nextData, $attributes);
+                $nextData = array_replace_recursive($nextData, $attributes);
 
                 // Append children values.
                 $nextData['children'] = $matches[1][$index];
@@ -292,14 +292,39 @@ class Sade
         ];
 
         // Prepare model data.
-        $result = array_merge($defaults, $result);
+        $result = array_replace_recursive($defaults, $result);
         $result['data'] = $this->data($result['data']);
 
         // Prepare extra model data.
-        $extra = array_merge($defaults, $extra);
-        $result['data'] = array_merge($result['data'], $this->data($extra['data']));
+        $extra = array_replace_recursive($defaults, $extra);
+        $result['data'] = array_replace_recursive($result['data'], $this->data($extra['data']));
 
         return (object) $result;
+    }
+
+    /**
+     * Set the only type (template, script or style) to include in the rendering.
+     *
+     * @param  string $type
+     *
+     * @return string
+     */
+    public function only($type)
+    {
+        $types = ['template', 'script', 'style'];
+        $options = [];
+
+        foreach ($types as $key) {
+            if ($key === $type) {
+                continue;
+            }
+
+            $options[$key] = [
+                'enabled' => false
+            ];
+        }
+
+        return $this->options($options);
     }
 
     /**
@@ -311,27 +336,7 @@ class Sade
      */
     public function options(array $options)
     {
-        $defaults = [
-            'cache'    => [
-                'dir'  => '',
-                'perm' => ( 0755 & ~ umask() ),
-            ],
-            'script'   => [
-                'enabled' => true,
-            ],
-            'style'    => [
-                'enabled' => true,
-                'scoped'  => false
-            ],
-            'template' => [
-                'enabled' => true,
-                'scoped'  => false
-            ],
-        ];
-
-        $this->options = new Config(array_merge($defaults, $options));
-
-        return $this;
+        return new Sade($this->dir, $options);
     }
 
     /**
@@ -446,7 +451,7 @@ class Sade
                 'filters'    => $this->bindData($this->model->filters, $data),
                 'id'         => $id,
                 'methods'    => $this->bindData($this->model->methods, $data),
-                'scoped'     => $scoped ? $scoped : $this->options['template']['scoped'],
+                'scoped'     => $scoped ? $scoped : $this->options->get('template.scoped', false),
             ]))->render($data);
 
             $template = $this->renderComponents($template, $types);
@@ -458,7 +463,7 @@ class Sade
                 'attributes' => $attributes['script'],
                 'content'    => $types['script'],
                 'id'         => $id,
-                'scoped'     => $scoped ? $scoped : $this->options['template']['scoped'],
+                'scoped'     => $scoped ? $scoped : $this->options->get('script.scoped', false),
             ]))->render();
         }
 
@@ -519,5 +524,33 @@ class Sade
         }
 
         $this->dir = $this->fileDir = $dir;
+    }
+
+    /**
+     * Setup options.
+     *
+     * @param array $options
+     */
+    protected function setupOptions($options)
+    {
+        $defaults = [
+            'cache'    => [
+                'dir'  => '',
+                'perm' => ( 0755 & ~ umask() ),
+            ],
+            'script'   => [
+                'enabled' => true,
+            ],
+            'style'    => [
+                'enabled' => true,
+                'scoped'  => false
+            ],
+            'template' => [
+                'enabled' => true,
+                'scoped'  => false
+            ],
+        ];
+
+        $this->options = new Config(array_replace_recursive($defaults, $options));
     }
 }

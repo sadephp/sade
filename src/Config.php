@@ -86,7 +86,7 @@ class Config implements ArrayAccess
         $keys = is_array($key) ? $key : [$key => $value];
 
         foreach ($keys as $key => $value) {
-            $items = $this->items;
+            $items = &$this->items;
             $parts = explode('.', $key);
 
             while (count($parts) > 1) {
@@ -96,7 +96,7 @@ class Config implements ArrayAccess
                     $array[$part] = [];
                 }
 
-                $items =& $items[$part];
+                $items = &$items[$part];
             }
 
             $items[array_shift($parts)] = $value;
