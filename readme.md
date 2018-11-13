@@ -6,6 +6,10 @@
 
 Sade, a library for creating PHP Components with [Twig](https://twig.symfony.com/doc/2.x/) (2.x). This package will not do any preprocessing or somthing like that.
 
+## Documentation
+
+The documentation is located [here](https://github.com/sadephp/sade/blob/master/docs/index.md)
+
 ## Example
 
 Single file:
@@ -13,21 +17,7 @@ Single file:
 ```php
 <template>
     <p>{{ greeting }} World!</p>
-    <image alt="{{ greeting }}" />
 </template>
-
-<?php
-    return [
-        'data' => function() {
-            return [
-                'greeting' => 'Hello'
-            ];
-        },
-        'components' => [
-            'image.php'
-        ]
-    ];
-?>
 
 <style scoped>
     p {
@@ -35,21 +25,14 @@ Single file:
         text-align: center;
     }
 </style>
-```
 
-Multiple files:
-
-```php
-<template src="greeting.twig" />
-<style src="greeting.css" />
-<script src="greeting.js" />
 <?php
     return [
         'data' => function() {
             return [
                 'greeting' => 'Hello'
             ];
-        },
+        }
     ];
 ?>
 ```
@@ -57,20 +40,9 @@ Multiple files:
 To render
 
 ```php
-$sade = new \Sade\Sade(__DIR__ . '/examples', [
-    'style' => [
-        // Force scoped style.
-        'scoped' => true
-    ]
-]);
+$sade = new \Sade\Sade(__DIR__ . '/examples');
 
 echo $sade->render('greeting.php');
-```
-
-## CLI usage
-
-```
-vendor/bin/sade path/to/component.php > component.html
 ```
 
 ## License
