@@ -1,5 +1,7 @@
 # Sade
 
+[![Build Status](https://travis-ci.org/sadephp/sade.svg?branch=master)](https://travis-ci.org/sadephp/sade)
+
 > Work in progress!
 
 Sade, a library for creating PHP Components with [Twig](https://twig.symfony.com/doc/2.x/) (2.x). This package will not do any preprocessing or somthing like that.
