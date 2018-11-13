@@ -41,6 +41,8 @@ Default options:
 * `style.scoped` will force scoped CSS and html if set to true.
 * `template.scoped` will force only scoped html if set to true.
 
+The `enabled` value can be set to disable rendering of a type tag.
+
 ```php
 $sade = new \Sade\Sade( __DIR__ . '/path/to/components', $options );
 ```
