@@ -122,35 +122,37 @@ class Rain
                 $key = pathinfo($file, PATHINFO_FILENAME);
             }
 
-            $components[$key] = $this->render($file, $this->attributes($key, $types['template']));
+            $components[$key] = $this->render($file, [
+                'data' => $this->attributes($key, $types['template']),
+            ]);
         }
 
         return $components;
     }
 
     /**
-     * Get data from model file.
+     * Get data from data object.
      *
-     * @return mixed
+     * @param  mixed $data
+     *
+     * @return array
      */
-    protected function data()
+    protected function data($data)
     {
-        $model = $this->model;
-        
-        if (empty($model->data)) {
+        if (empty($data)) {
             return [];
         }
 
-        if (is_array($model->data)) {
-            return $model->data;
+        if (is_array($data)) {
+            return $data;
         }
 
-        if (is_callable($model->data)) {
-            $model = call_user_func($model->data);
+        if (is_callable($data)) {
+            $data = call_user_func($data);
         }
         
-        if (is_array($model)) {
-            return $model;
+        if (is_array($data)) {
+            return $data;
         }
 
         return [];
@@ -218,10 +220,11 @@ class Rain
      * Load php model code.
      *
      * @param  string $file
+     * @param  array  $extra
      *
      * @return mixed
      */
-    protected function model($file)
+    protected function model($file, array $extra = [])
     {
         ob_start();
         $result = require $this->file($file);
@@ -238,7 +241,13 @@ class Rain
             'methods' => [],
         ];
 
+        // Prepare model data.
         $result = array_merge($defaults, $result);
+        $result['data'] = $this->data($result['data']);
+
+        // Prepare extra model data.
+        $extra = array_merge($defaults, $extra);
+        $result['data'] = array_merge($result['data'], $this->data($extra['data']));
 
         return (object) $result;
     }
@@ -247,11 +256,11 @@ class Rain
      * Render component file.
      *
      * @param  string $file
-     * @param  array  $data
+     * @param  array  $model
      *
      * @return mixed
      */
-    public function render($file, array $data = [])
+    public function render($file, array $model = [])
     {
         $filepath = $this->file($file);
 
@@ -263,7 +272,7 @@ class Rain
             return $cache;
         }
 
-        $this->model = $this->model($file);
+        $this->model = $this->model($file, $model);
         $contents = file_get_contents($filepath);
 
         $types = [
@@ -333,15 +342,7 @@ class Rain
 
         // Generate component id.
         $id = $this->id($filepath);
-
-        // Remove any prop- prefixes.
-        foreach ($data as $key => $value) {
-            unset($data[$key]);
-            $key = str_replace('prop-', '', $key);
-            $data[$key] = $value;
-        }
-
-        $data = array_merge($this->data(), $data);
+        $data = $this->model->data;
 
         // Create template html.
         $template = (new Template([
