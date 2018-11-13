@@ -12,8 +12,6 @@ The documentation is located [here](https://github.com/sadephp/sade/blob/master/
 
 ## Example
 
-Single file:
-
 ```php
 <template>
     <p>{{ greeting }} World!</p>
