@@ -73,11 +73,13 @@ class Cache
      *
      * @param  string $file
      * @param  string $content
+     *
+     * @return string
      */
     public function set($file, $content)
     {
         if (empty($this->options['dir'])) {
-            return;
+            return $content;
         }
 
         if (!is_dir($this->options['dir'])) {
@@ -87,5 +89,7 @@ class Cache
         $file = $this->file($file);
 
         file_put_contents($file, $content);
+
+        return $content;
     }
 }

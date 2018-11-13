@@ -23,11 +23,16 @@ Default options:
         'dir'  => '',
         'perm' => ( 0755 & ~ umask() ),
     ],
+    'script'   => [
+        'enabled' => true,
+    ],
     'style'    => [
-        'scoped' => false
+        'enabled' => true,
+        'scoped'  => false
     ],
     'template' => [
-        'scoped' => false
+        'enabled' => true,
+        'scoped'  => false
     ],
 ]
 ```

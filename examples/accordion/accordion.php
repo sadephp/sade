@@ -1,5 +1,5 @@
 <template src="accordion.twig" />
-<script src="//accordion.js" />
+<script src="accordion.js" />
 <style src="accordion.css"></style>
 
 <?php
