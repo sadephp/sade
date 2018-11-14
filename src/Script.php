@@ -63,7 +63,9 @@ class Script
             return '';
         }
 
-        $content = preg_replace('/\s+/', ' ', trim($content));
+        if (!defined('SADE_DEV')) {
+            $content = preg_replace('/\s+/', ' ', trim($content));
+        }
 
         return sprintf('<script %s>%s</script>', $attr_html, $content);
     }
