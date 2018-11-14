@@ -422,7 +422,9 @@ class Sade
         foreach ($this->tags as $tag) {
             $enabled = $this->options->get(sprintf('%s.enabled', $tag), true);
             if ($enabled) {
-                $output[$tag] = trim(call_user_func_array([$this, 'render' . ucfirst($tag)], [$id, $attributes, $types]));
+                $func = [$this, 'render' . ucfirst($tag)];
+                $res = call_user_func_array($func, [$id, $attributes, $types]);
+                $output[$tag] = trim($res);
             }
         }
 
@@ -481,7 +483,7 @@ class Sade
         }
 
         // Only render template tag if file already rendered.
-        if (isset($this->rendered[$filepath]) && isset($this->rendered[$filepath]['template']) && $this->options['cache']) {
+        if (!empty($this->rendered[$filepath]['template']) && $this->options['cache']) {
             return $this->rendered[$filepath]['template'];
         }
 
