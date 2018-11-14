@@ -113,7 +113,7 @@ Example:
 ?>
 ```
 
-Template, script and style tags has a `src` attribute that can include other files instead of having all in the same file. All other attributes (except `src` attribute and some special ones) will be passed along to div (when scoped), script and style tags, some additional attributes will be added, read more about this below under each tag.
+Template, script and style tags has a `src` attribute that can include other files instead of having all in the same file. All other attributes will be passed along to div (when scoped), script and style tags, some additional attributes will be added, read more about this below under each tag.
 
 Example:
 
@@ -137,7 +137,7 @@ All attributes will be passed along and `data-sade-id` will be added with the di
 
 ### Style tag
 
-All attributes will be passed along except the `scoped` attribute.
+All attributes will be passed along.
 
 The style tag can scope CSS with a uniq ID that is added to a div tag.
 

@@ -45,10 +45,6 @@ class Style
             $attributes['type'] = 'text/css';
         }
 
-        if (isset($attributes['scoped'])) {
-            unset($attributes['scoped']);
-        }
-
         $attr_html = '';
 
         foreach ($attributes as $key => $value) {
