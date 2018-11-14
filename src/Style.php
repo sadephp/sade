@@ -83,12 +83,12 @@ class Style
         if ($this->options['scoped']) {
             foreach ($css->getAllDeclarationBlocks() as $block) {
                 foreach ($block->getSelectors() as $selector) {
-                    $selector->setSelector('#' . $this->options['id'] . ' ' . $selector->getSelector());
+                    $selector->setSelector('.' . $this->options['id'] . ' ' . $selector->getSelector());
                 }
             }
         }
 
-        return preg_replace('/\s+/', '', $css->render());
+        return trim($css->render());
     }
 
     /**
