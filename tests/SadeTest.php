@@ -47,6 +47,7 @@ class SadeTest extends TestCase
         $output = $this->sade->render('accordion/accordion.php');
 
         $this->assertTrue(strpos($output, '<div') !== false && strpos($output, '<script') !== false && strpos($output, 'tag = "style"') !== false);
+        $this->assertRegExp('/\<div\sclass\=\"sade\-\w+\"/', $output);
     }
 
     public function testOnlyRender()

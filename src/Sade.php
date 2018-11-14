@@ -192,7 +192,7 @@ class Sade
                 $nextData['children'] = $matches[1][$index];
 
                 // Render child component.
-                $components[$before] = $this->render($this->file($file), [
+                $components[$before] = $this->preRender($file, [
                     'data' => $nextData,
                 ]);
             }
@@ -426,6 +426,19 @@ class Sade
             }
         }
 
+        $components = $this->components($types);
+
+        // Append all components in the right order.
+        foreach ($components as $key => $component) {
+            foreach ($this->tags as $tag) {
+                if ($tag === 'template') {
+                    $output[$tag] = str_replace($key, $component[$tag], $output[$tag]);
+                } else {
+                    $output[$tag] .= $component[$tag];
+                }
+            }
+        }
+
         $this->rendered[$filepath] = $output;
 
         return $output;
@@ -452,16 +465,14 @@ class Sade
         }
 
         // Store additional directories.
-        if ($file[0] !== '/') {
-            $dirs = explode('/', $file);
-            $dirs = array_slice($dirs, 0, count($dirs) -1);
-            $dirs = implode('/', $dirs);
-            $this->fileDir = implode('/', [$this->dir, $dirs]);
+        $dirs = explode('/', $file);
+        $dirs = array_slice($dirs, 0, count($dirs) -1);
+        $dirs = implode('/', $dirs);
+        $this->fileDir = implode('/', [$this->dir, $dirs]);
 
-            // Remove any path in file.
-            $file = explode('/', $file);
-            $file = array_pop($file);
-        }
+        // Remove any path in file.
+        $file = explode('/', $file);
+        $file = array_pop($file);
 
         $filepath = $this->file($file);
 
@@ -475,36 +486,8 @@ class Sade
         }
 
         $output = $this->preRender($file, $model);
-        $html = trim(implode('', array_values($output)));
 
-        // Strip additional script and style tags that child components adds.
-        if (isset($this->rendered[$filepath]['template'])) {
-            $this->rendered[$filepath]['template'] = $this->stripHTML($this->rendered[$filepath]['template'], ['script', 'style']);
-        }
-
-        return $html;
-    }
-
-    /**
-     * Render components.
-     *
-     * @param  string $template
-     * @param  array  $types
-     *
-     * @return string
-     */
-    protected function renderComponents($template, $types)
-    {
-        $types['template'] = $template;
-
-        $components = $this->components($types);
-
-        // Replace components tags.
-        foreach ($components as $key => $html) {
-            $template = str_replace($key, $html, $template);
-        }
-
-        return $template;
+        return trim(implode('', array_values($output)));
     }
 
     /**
@@ -521,7 +504,7 @@ class Sade
         $scoped = $this->scoped($attributes);
         $data = $this->model->data;
 
-        $template = (new Template([
+        return (new Template([
             'attributes' => $attributes['template'],
             'content'    => $types['template'],
             'filters'    => $this->bindData($this->model->filters, $data),
@@ -529,10 +512,6 @@ class Sade
             'methods'    => $this->bindData($this->model->methods, $data),
             'scoped'     => $scoped ? $scoped : $this->options->get('template.scoped', false),
         ]))->render($data);
-
-        $template = $this->renderComponents($template, $types);
-
-        return $template;
     }
 
     /**
@@ -632,24 +611,6 @@ class Sade
         ];
 
         $this->options = new Config(array_replace_recursive($defaults, $options));
-    }
-
-    /**
-     * Strip html tags.
-     *
-     * @param  string $html
-     * @param  array  $tags
-     *
-     * @return string
-     */
-    protected function stripHTML($html, array $tags = [])
-    {
-        foreach ($tags as $tag) {
-            $reg = '/<\s*' . $tag . '[^>]*>(?:(.*?)<\s*\/\s*' . $tag .'>|)/is';
-            $html = preg_replace($reg, '', $html);
-        }
-
-        return $html;
     }
 
     /**
