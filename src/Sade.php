@@ -8,6 +8,13 @@ use Hashids\Hashids;
 class Sade
 {
     /**
+     * Component data.
+     *
+     * @var array
+     */
+    protected $data = null;
+
+    /**
      * Components directory.
      *
      * @var string
@@ -20,13 +27,6 @@ class Sade
      * @var string
      */
     protected $fileDir = '';
-
-    /**
-     * Model value.
-     *
-     * @var array
-     */
-    protected $model = [];
 
     /**
      * Sade options.
@@ -42,7 +42,7 @@ class Sade
      */
     protected $parent = [
         'attributes' => [],
-        'model'      => null,
+        'data'       => null,
     ];
 
     /**
@@ -114,30 +114,6 @@ class Sade
     }
 
     /**
-     * Bind data to functions.
-     *
-     * @param  array $funcs
-     * @param  array $data
-     *
-     * @return array
-     */
-    protected function bindData(array $funcs, array $data)
-    {
-        $data = (object) $data;
-
-        foreach ($funcs as $key => $func) {
-            if (!is_callable($func)) {
-                unset($funcs[$key]);
-                continue;
-            }
-
-            $func[$key] = Closure::bind($func, $data);
-        }
-
-        return $funcs;
-    }
-
-    /**
      * Render components.
      *
      * @param  array $types
@@ -146,20 +122,20 @@ class Sade
      */
     protected function components($types)
     {
-        $model = $this->model;
+        $data = $this->data;
 
-        if (empty($model->components)) {
+        if (empty($data->components)) {
             return [];
         }
 
-        if (! is_array($model->components)) {
+        if (!is_array($data->components)) {
             return [];
         }
 
         $components = [];
         $template   = $types['template'];
 
-        foreach ($model->components as $key => $file) {
+        foreach ($data->components as $key => $file) {
             if (is_numeric($key)) {
                 $key = pathinfo($file, PATHINFO_FILENAME);
             }
@@ -169,17 +145,16 @@ class Sade
                 continue;
             }
 
-            $nextModel = $this->model($file);
             $nextData = [];
 
             // Pass along proprties from parent component if requested.
-            foreach ($nextModel->props as $key) {
+            foreach ($this->data($file)->props as $key) {
                 if (isset($this->parent['attributes'][$key])) {
                     $nextData[$key] = $this->parent['attributes'][$key];
                 }
 
-                if (isset($model->data[$key])) {
-                    $nextData[$key] = $model->data[$key];
+                if (isset($data->data[$key])) {
+                    $nextData[$key] = $data->data[$key];
                 }
             }
 
@@ -203,31 +178,24 @@ class Sade
     }
 
     /**
-     * Get data from data object.
+     * Load component data.
      *
-     * @param  mixed $data
+     * @param  string $file
+     * @param  array  $extra
      *
-     * @return array
+     * @return mixed
      */
-    protected function data($data)
+    protected function data($file, array $extra = [])
     {
-        if (empty($data)) {
-            return [];
+        ob_start();
+        $result = require $this->file($file);
+        ob_end_clean();
+
+        if (!is_array($result)) {
+            $result = [];
         }
 
-        if (is_array($data)) {
-            return $data;
-        }
-
-        if (is_callable($data)) {
-            $data = call_user_func($data);
-        }
-
-        if (is_array($data)) {
-            return $data;
-        }
-
-        return [];
+        return new Data($result, $extra);
     }
 
     /**
@@ -267,44 +235,6 @@ class Sade
         $id = $hashids->encode(1, 2, 3);
 
         return 'sade-' . strtolower($id);
-    }
-
-    /**
-     * Load php model code.
-     *
-     * @param  string $file
-     * @param  array  $extra
-     *
-     * @return mixed
-     */
-    protected function model($file, array $extra = [])
-    {
-        ob_start();
-        $result = require $this->file($file);
-        ob_end_clean();
-
-        if (!is_array($result)) {
-            $result = [];
-        }
-
-        $defaults = [
-            'components' => [],
-            'data'       => function () {
-            },
-            'filters'    => [],
-            'methods'    => [],
-            'props'      => [],
-        ];
-
-        // Prepare model data.
-        $result = array_replace_recursive($defaults, $result);
-        $result['data'] = $this->data($result['data']);
-
-        // Prepare extra model data.
-        $extra = array_replace_recursive($defaults, $extra);
-        $result['data'] = array_replace_recursive($result['data'], $this->data($extra['data']));
-
-        return (object) $result;
     }
 
     /**
@@ -400,11 +330,11 @@ class Sade
      * Pre render file and return array of type tags.
      *
      * @param  string $file
-     * @param  array  $model
+     * @param  array  $data
      *
      * @return array
      */
-    protected function preRender($file, array $model = [])
+    protected function preRender($file, array $data = [])
     {
         $filepath = $this->file($file);
 
@@ -412,7 +342,7 @@ class Sade
             return [];
         }
 
-        $this->model = $this->parent['model'] = $this->model($file, $model);
+        $this->data = $this->parent['data'] = $this->data($file, $data);
         $id = $this->id($filepath);
 
         // Find attributes and types.
@@ -452,11 +382,11 @@ class Sade
      * Render component file.
      *
      * @param  string $file
-     * @param  array  $model
+     * @param  array  $data
      *
      * @return mixed
      */
-    public function render($file, array $model = [])
+    public function render($file, array $data = [])
     {
         if (is_array($file)) {
             $output = '';
@@ -489,7 +419,7 @@ class Sade
             return $this->rendered[$filepath]['template'];
         }
 
-        $output = $this->preRender($file, $model);
+        $output = $this->preRender($file, $data);
 
         return trim(implode('', array_values($output)));
     }
@@ -506,14 +436,14 @@ class Sade
     protected function renderTemplate($id, $attributes, $types)
     {
         $scoped = $this->scoped($attributes);
-        $data = $this->model->data;
+        $data = $this->data->data;
 
         return (new Template([
             'attributes' => $attributes['template'],
             'content'    => $types['template'],
-            'filters'    => $this->bindData($this->model->filters, $data),
+            'filters'    => $this->data->filters,
             'id'         => $id,
-            'methods'    => $this->bindData($this->model->methods, $data),
+            'methods'    => $this->data->methods,
             'scoped'     => $scoped ? $scoped : $this->options->get('template.scoped', false),
         ]))->render($data);
     }

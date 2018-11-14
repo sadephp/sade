@@ -79,7 +79,7 @@ class Config implements ArrayAccess
      * Set configuration value.
      *
      * @param  string $key
-     * @param  array  $mixed
+     * @param  mixed  $value
      */
     public function set($key, $value = null)
     {
@@ -99,7 +99,13 @@ class Config implements ArrayAccess
                 $items = &$items[$part];
             }
 
-            $items[array_shift($parts)] = $value;
+            $name = array_shift($parts);
+
+            if (is_array($items[$name])) {
+                $items[$name] = array_replace_recursive($items[$name], $value);
+            } else {
+                $items[$name] = $value;
+            }
         }
     }
 
@@ -107,6 +113,7 @@ class Config implements ArrayAccess
      * Determine if the given configuration option exists.
      *
      * @param  string $key
+     *
      * @return bool
      */
     public function offsetExists($key)
@@ -118,6 +125,7 @@ class Config implements ArrayAccess
      * Get a configuration option.
      *
      * @param  string  $key
+     *
      * @return mixed
      */
     public function offsetGet($key)
@@ -129,6 +137,7 @@ class Config implements ArrayAccess
      * Set a configuration option.
      *
      * @param  string $key
+     *
      * @param  mixed  $value
      */
     public function offsetSet($key, $value)
@@ -142,6 +151,52 @@ class Config implements ArrayAccess
      * @param  string $key
      */
     public function offsetUnset($key)
+    {
+        $this->set($key, null);
+    }
+
+    /**
+     * Get a configuration option.
+     *
+     * @param  string $name
+     *
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->get($key);
+    }
+
+    /**
+     * Determine if the given configuration option exists.
+     *
+     * @param  string $key
+     *
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        return $this->has($key);
+    }
+
+    /**
+     * Set a configuration option.
+     *
+     * @param  string $key
+     *
+     * @param  mixed  $value
+     */
+    public function __set($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    /**
+     * Unset a configuration option.
+     *
+     * @param  string $key
+     */
+    public function __unset($key)
     {
         $this->set($key, null);
     }
