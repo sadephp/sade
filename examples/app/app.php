@@ -1,13 +1,20 @@
 <template>
-    <Provider name="Parent attribute">
+    <h5>App Component</h5>
+    <Provider name="App Name">
         <Post />
     </Provider>
 </template>
 
-<script>
-document.body.style.backgroundColor = 'yellow';
-</script>
+<style scoped>
+    {
+        font-family: Helvetica,Arial,sans-serif;
+    }
 
+    p {
+        background: #232323;
+        padding: 10px;
+    }
+</style>
 
 <?php
 

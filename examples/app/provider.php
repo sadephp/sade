@@ -1,7 +1,17 @@
 <template>
-    {{ children | raw }}
+    <div>
+        <h5>Provider component</h5>
+        {{ children | raw }}
+    </div>
 </template>
 
 <script>
-document.body.style.backgroundColor = 'blue';
 </script>
+
+<style scoped>
+    div {
+        background: #d8e5e7;
+        padding: 20px;
+        margin: 20px 0;
+    }
+</style>
