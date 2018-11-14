@@ -395,6 +395,43 @@ class Sade
     }
 
     /**
+     * Pre render file and return array of type tags.
+     *
+     * @param  string $file
+     * @param  array  $model
+     *
+     * @return array
+     */
+    protected function preRender($file, array $model = [])
+    {
+        $filepath = $this->file($file);
+
+        if (!file_exists($filepath)) {
+            return [];
+        }
+
+        $this->model = $this->parent['model'] = $this->model($file, $model);
+        $id = $this->id($filepath);
+
+        // Find attributes and types.
+        list($attributes, $types) = $this->parseFileContent(file_get_contents($filepath));
+
+        $output = [];
+
+        // Render template, script and style tags.
+        foreach ($this->tags as $tag) {
+            $enabled = $this->options->get(sprintf('%s.enabled', $tag), true);
+            if ($enabled) {
+                $output[$tag] = trim(call_user_func_array([$this, 'render' . ucfirst($tag)], [$id, $attributes, $types]));
+            }
+        }
+
+        $this->rendered[$filepath] = $output;
+
+        return $output;
+    }
+
+    /**
      * Render component file.
      *
      * @param  string $file
@@ -414,8 +451,8 @@ class Sade
             return $output;
         }
 
+        // Store additional directories.
         if ($file[0] !== '/') {
-            // Store additional directories.
             $dirs = explode('/', $file);
             $dirs = array_slice($dirs, 0, count($dirs) -1);
             $dirs = implode('/', $dirs);
@@ -437,24 +474,7 @@ class Sade
             return $this->rendered[$filepath]['template'];
         }
 
-        $this->model = $this->parent['model'] = $this->model($file, $model);
-        $id = $this->id($filepath);
-
-        // Find attributes and types.
-        list($attributes, $types) = $this->parseFileContent(file_get_contents($filepath));
-
-        $output = [];
-
-        // Render template, script and style tags.
-        foreach ($this->tags as $tag) {
-            $enabled = $this->options->get(sprintf('%s.enabled', $tag), true);
-            if ($enabled) {
-                $output[$tag] = trim(call_user_func_array([$this, 'render' . ucfirst($tag)], [$id, $attributes, $types]));
-            }
-        }
-
-        $this->rendered[$filepath] = $output;
-
+        $output = $this->preRender($file, $model);
         $html = trim(implode('', array_values($output)));
 
         // Strip additional script and style tags that child components adds.
