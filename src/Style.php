@@ -88,7 +88,7 @@ class Style
             }
         }
 
-        return trim($css->render());
+        return preg_replace('/\s+/', ' ', trim($css->render()));
     }
 
     /**
