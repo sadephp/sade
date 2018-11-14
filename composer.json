@@ -14,7 +14,8 @@
     },
     "require": {
         "twig/twig": "^2.0",
-        "sabberworm/php-css-parser": "^8.2"
+        "sabberworm/php-css-parser": "^8.2",
+        "hashids/hashids": "^3.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.3",

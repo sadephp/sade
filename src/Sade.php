@@ -3,6 +3,7 @@
 namespace Sade;
 
 use Closure;
+use Hashids\Hashids;
 
 class Sade
 {
@@ -262,9 +263,9 @@ class Sade
     public function id($file)
     {
         $file = $this->file($file);
-        $id = substr(base64_encode($file), 0, 12);
+        $hashids = new Hashids($file);
 
-        return 'sade-' . strtolower($id);
+        return 'sade-' . $hashids->encode(1, 2, 3);
     }
 
     /**
