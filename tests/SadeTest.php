@@ -7,7 +7,9 @@ class SadeTest extends TestCase
 {
     public function setUp()
     {
-        $this->sade = new Sade(__DIR__ . '/testdata');
+        $this->sade = new Sade(__DIR__ . '/testdata', [
+            'cache' => false,
+        ]);
     }
 
     public function testRender()
@@ -44,13 +46,13 @@ class SadeTest extends TestCase
     {
         $output = $this->sade->render('accordion/accordion.php');
 
-        $this->assertTrue(strpos($output, '<div') !== false && strpos($output, '<script') !== false && strpos($output, '<style') !== false);
+        $this->assertTrue(strpos($output, '<div') !== false && strpos($output, '<script') !== false && strpos($output, 'tag = "style"') !== false);
     }
 
     public function testOnlyRender()
     {
         $output = $this->sade->only('script')->render('accordion/accordion.php');
 
-        $this->assertTrue(strpos($output, '<div') === false && strpos($output, '<script') !== false && strpos($output, '<style') === false);
+        $this->assertTrue(strpos($output, '<div') === false && strpos($output, '<script') !== false && strpos($output, 'tag = "style"') === false);
     }
 }

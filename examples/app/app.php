@@ -4,6 +4,11 @@
     </Provider>
 </template>
 
+<script>
+document.body.style.backgroundColor = 'yellow';
+</script>
+
+
 <?php
 
 return [

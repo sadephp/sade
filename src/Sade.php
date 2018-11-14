@@ -7,11 +7,6 @@ use Closure;
 class Sade
 {
     /**
-     * Cache instance.
-     */
-    protected $cache;
-
-    /**
      * Components directory.
      *
      * @var string
@@ -50,6 +45,13 @@ class Sade
     ];
 
     /**
+     * Rendered components.
+     *
+     * @var array
+     */
+    protected $rendered = [];
+
+    /**
      * Component tags.
      *
      * @var array
@@ -70,8 +72,6 @@ class Sade
     {
         $this->setupDir($dir);
         $this->setupOptions($options);
-
-        $this->cache = new Cache($this->options->get('cache'));
     }
 
     /**
@@ -137,18 +137,6 @@ class Sade
     }
 
     /**
-     * Determine if cache is enabled or not.
-     *
-     * @return bool
-     */
-    protected function cacheEnabled()
-    {
-        return $this->options->get('template.enabled', true) &&
-            $this->options->get('script.enabled', true) &&
-            $this->options->get('style.enabled', true);
-    }
-
-    /**
      * Render components.
      *
      * @param  array $types
@@ -204,7 +192,7 @@ class Sade
                 $nextData['children'] = $matches[1][$index];
 
                 // Render child component.
-                $components[$before] = $this->render($file, [
+                $components[$before] = $this->render($this->file($file), [
                     'data' => $nextData,
                 ]);
             }
@@ -250,6 +238,10 @@ class Sade
      */
     protected function file($file)
     {
+        if (file_exists(realpath($file))) {
+            return $file;
+        }
+
         $dir = rtrim($this->fileDir, '/') . '/';
         $file = ltrim($file, '/');
 
@@ -257,7 +249,7 @@ class Sade
             return $file;
         }
 
-        return $dir . $file;
+        return realpath($dir . $file);
     }
 
     /**
@@ -422,15 +414,17 @@ class Sade
             return $output;
         }
 
-        // Store additional directories.
-        $dirs = explode('/', $file);
-        $dirs = array_slice($dirs, 0, count($dirs) -1);
-        $dirs = implode('/', $dirs);
-        $this->fileDir = implode('/', [$this->dir, $dirs]);
+        if ($file[0] !== '/') {
+            // Store additional directories.
+            $dirs = explode('/', $file);
+            $dirs = array_slice($dirs, 0, count($dirs) -1);
+            $dirs = implode('/', $dirs);
+            $this->fileDir = implode('/', [$this->dir, $dirs]);
 
-        // Remove any path in file.
-        $file = explode('/', $file);
-        $file = array_pop($file);
+            // Remove any path in file.
+            $file = explode('/', $file);
+            $file = array_pop($file);
+        }
 
         $filepath = $this->file($file);
 
@@ -438,65 +432,37 @@ class Sade
             return;
         }
 
-        // Try using the cache value.
-        if ($this->cacheEnabled()) {
-            if ($cache = $this->cache->get($file, filemtime($filepath))) {
-                return $cache;
-            }
+        // Only render template tag if file already rendered.
+        if (isset($this->rendered[$filepath]) && isset($this->rendered[$filepath]['template']) && $this->options['cache']) {
+            return $this->rendered[$filepath]['template'];
         }
 
         $this->model = $this->parent['model'] = $this->model($file, $model);
+        $id = $this->id($filepath);
 
         // Find attributes and types.
         list($attributes, $types) = $this->parseFileContent(file_get_contents($filepath));
 
-        // Generate component id.
-        $id = $this->id($filepath);
+        $output = [];
 
-        // Global options.
-        $scoped = isset($attributes['style']['scoped']) ? true : $this->options->get('style.scoped', false);
-        $template = '';
-
-        // Append template html if enabled.
-        if ($this->options->get('template.enabled', true)) {
-            $data = $this->model->data;
-            $template .= (new Template([
-                'attributes' => $attributes['template'],
-                'content'    => $types['template'],
-                'filters'    => $this->bindData($this->model->filters, $data),
-                'id'         => $id,
-                'methods'    => $this->bindData($this->model->methods, $data),
-                'scoped'     => $scoped ? $scoped : $this->options->get('template.scoped', false),
-            ]))->render($data);
-
-            $template = $this->renderComponents($template, $types);
+        // Render template, script and style tags.
+        foreach ($this->tags as $tag) {
+            $enabled = $this->options->get(sprintf('%s.enabled', $tag), true);
+            if ($enabled) {
+                $output[$tag] = trim(call_user_func_array([$this, 'render' . ucfirst($tag)], [$id, $attributes, $types]));
+            }
         }
 
-        // Append JavaScript html if enabled.
-        if ($this->options->get('script.enabled', true)) {
-            $template .= (new Script([
-                'attributes' => $attributes['script'],
-                'content'    => $types['script'],
-                'id'         => $id,
-                'scoped'     => $scoped ? $scoped : $this->options->get('script.scoped', false),
-            ]))->render();
+        $this->rendered[$filepath] = $output;
+
+        $html = trim(implode('', array_values($output)));
+
+        // Strip additional script and style tags that child components adds.
+        if (isset($this->rendered[$filepath]['template'])) {
+            $this->rendered[$filepath]['template'] = $this->stripHTML($this->rendered[$filepath]['template'], ['script', 'style']);
         }
 
-        // Append style html if enabled.
-        if ($this->options->get('style.enabled', true)) {
-            $template .= (new Style([
-                'attributes' => $attributes['style'],
-                'content'    => $types['style'],
-                'id'         => $id,
-                'scoped'     => $scoped,
-            ]))->render();
-        }
-
-        if ($this->cacheEnabled()) {
-            return $this->cache->set($file, trim($template));
-        }
-
-        return trim($template);
+        return $html;
     }
 
     /**
@@ -519,6 +485,87 @@ class Sade
         }
 
         return $template;
+    }
+
+    /**
+     * Render template tag.
+     *
+     * @param  string $id
+     * @param  array  $attributes
+     * @param  array  $types
+     *
+     * @return string
+     */
+    protected function renderTemplate($id, $attributes, $types)
+    {
+        $scoped = $this->scoped($attributes);
+        $data = $this->model->data;
+
+        $template = (new Template([
+            'attributes' => $attributes['template'],
+            'content'    => $types['template'],
+            'filters'    => $this->bindData($this->model->filters, $data),
+            'id'         => $id,
+            'methods'    => $this->bindData($this->model->methods, $data),
+            'scoped'     => $scoped ? $scoped : $this->options->get('template.scoped', false),
+        ]))->render($data);
+
+        $template = $this->renderComponents($template, $types);
+
+        return $template;
+    }
+
+    /**
+     * Render script tag.
+     *
+     * @param  string $id
+     * @param  array  $attributes
+     * @param  array  $types
+     *
+     * @return string
+     */
+    protected function renderScript($id, $attributes, $types)
+    {
+        $scoped = $this->scoped($attributes);
+
+        return (new Script([
+            'attributes' => $attributes['script'],
+            'content'    => $types['script'],
+            'id'         => $id,
+            'scoped'     => $scoped ? $scoped : $this->options->get('script.scoped', false),
+        ]))->render();
+    }
+
+    /**
+     * Render style tag.
+     *
+     * @param  string $id
+     * @param  array  $attributes
+     * @param  array  $types
+     *
+     * @return string
+     */
+    protected function renderStyle($id, $attributes, $types)
+    {
+        return (new Style([
+            'attributes' => $attributes['style'],
+            'content'    => $types['style'],
+            'id'         => $id,
+            'scoped'     => $this->scoped($attributes),
+            'tag'        => $this->options->get('style.tag', 'script'),
+        ]))->render();
+    }
+
+    /**
+     * Test if attributes contains a scoped style tag or is scoped by default.
+     *
+     * @param  array $attributes
+     *
+     * @return bool
+     */
+    protected function scoped($attributes)
+    {
+        return isset($attributes['style']['scoped']) ? true : $this->options->get('style.scoped', false);
     }
 
     /**
@@ -549,16 +596,14 @@ class Sade
     protected function setupOptions($options)
     {
         $defaults = [
-            'cache'    => [
-                'dir'  => '',
-                'perm' => ( 0755 & ~ umask() ),
-            ],
+            'cache'    => true,
             'script'   => [
                 'enabled' => true,
             ],
             'style'    => [
                 'enabled' => true,
-                'scoped'  => false
+                'scoped'  => false,
+                'tag'     => 'script',
             ],
             'template' => [
                 'enabled' => true,
@@ -567,6 +612,24 @@ class Sade
         ];
 
         $this->options = new Config(array_replace_recursive($defaults, $options));
+    }
+
+    /**
+     * Strip html tags.
+     *
+     * @param  string $html
+     * @param  array  $tags
+     *
+     * @return string
+     */
+    protected function stripHTML($html, array $tags = [])
+    {
+        foreach ($tags as $tag) {
+            $reg = '/<\s*' . $tag . '[^>]*>(?:(.*?)<\s*\/\s*' . $tag .'>|)/is';
+            $html = preg_replace($reg, '', $html);
+        }
+
+        return $html;
     }
 
     /**

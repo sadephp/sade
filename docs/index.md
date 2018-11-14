@@ -19,16 +19,14 @@ Default options:
 
 ```php
 [
-    'cache'    => [
-        'dir'  => '',
-        'perm' => ( 0755 & ~ umask() ),
-    ],
+    'cache'    => true,
     'script'   => [
         'enabled' => true,
     ],
     'style'    => [
         'enabled' => true,
-        'scoped'  => false
+        'scoped'  => false,
+        'tag'     => 'script',
     ],
     'template' => [
         'enabled' => true,
@@ -37,14 +35,14 @@ Default options:
 ]
 ```
 
-* `cahce.dir` cache directory path.
+* `cahce` will cache output html so if you render same component again only the html will be returned since you have the script and style tags already.
 * `style.scoped` will force scoped CSS and html if set to true.
 * `template.scoped` will force only scoped html if set to true.
 
 The `enabled` value can be set to disable rendering of a type tag.
 
 ```php
-$sade = new \Sade\Sade( __DIR__ . '/path/to/components', $options );
+$sade = new \Sade\Sade(__DIR__ . '/path/to/components', $options);
 ```
 
 You can always change options using `$sade->options` and it will return a new instance of Sade class.
@@ -56,7 +54,7 @@ To render a Sade component you create a new instanceof the `\Sade\Sade` class wi
 Example:
 
 ```php
-$sade = new \Sade\Sade( __DIR__ . '/path/to/components' );
+$sade = new \Sade\Sade(__DIR__ . '/path/to/components');
 
 echo $sade->render('greeting.php');
 ```
@@ -113,7 +111,7 @@ Example:
 ?>
 ```
 
-Template, script and style tags has a `src` attribute that can include other files instead of having all in the same file. All other attributes will be passed along to div (when scoped), script and style tags, some additional attributes will be added, read more about this below under each tag.
+Template, script and style tags has a `src` attribute that can include other files instead of having all in the same file. All other attributes (except scoped and some special ones) will be passed along to div (when scoped), script and style tags, some additional attributes will be added, read more about this below under each tag.
 
 Example:
 
@@ -133,13 +131,13 @@ All attributes will be passed along when template is scoped either via `template
 
 ### Script tag
 
-All attributes will be passed along and `data-sade-id` will be added with the div id when scoped.
+All attributes will be passed along and `data-sade-class` will be added with the div id when scoped.
 
 ### Style tag
 
-All attributes will be passed along.
+All attributes will be passed along except scoped attribute. `data-sade-class` will be added with the div id when scoped. The style tag can scope CSS with a uniq class that is added to a div tag.
 
-The style tag can scope CSS with a uniq ID that is added to a div tag.
+The style tag will be rendered by default but can be configured to be rendered as a style tag.
 
 Example:
 
@@ -152,15 +150,13 @@ Example:
 </style>
 ```
 
-Output:
+CSS Output:
 
-```html
-<style type="text/css">
+```css
 #sade-l3uvc2l0zxmv p {
     font-size: 2em;
     text-align: center;
 }
-</style>
 ```
 
 ### PHP data

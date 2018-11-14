@@ -43,8 +43,8 @@ class Script
             $attributes['type'] = 'text/javascript';
         }
 
-        if ($this->options['scoped'] && empty($attributes['data-sade-id'])) {
-            $attributes['data-sade-id'] = $this->options['id'];
+        if ($this->options['scoped'] && empty($attributes['data-sade-class']) && !empty($this->options['id'])) {
+            $attributes['data-sade-class'] = $this->options['id'];
         }
 
         $attr_html = '';

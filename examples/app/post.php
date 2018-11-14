@@ -3,6 +3,10 @@
     <p>post.php</p>
 </template>
 
+<script>
+document.body.style.backgroundColor = 'red';
+</script>
+
 <?php
 
 return [

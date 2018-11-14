@@ -16,6 +16,7 @@ class Style
         'content'    => '',
         'id'         => '',
         'scoped'     => false,
+        'tag'        => 'script',
     ];
 
     /**
@@ -26,14 +27,18 @@ class Style
     public function __construct(array $options = [])
     {
         $this->options = array_merge($this->options, $options);
+
+        if (isset($this->options['attributes']['src'])) {
+            $this->options['tag'] = 'script';
+        }
     }
 
     /**
-     * Render style html.
+     * Get attributes.
      *
-     * @return string
+     * @return array
      */
-    public function render()
+    protected function attributes()
     {
         $attributes = $this->options['attributes'];
 
@@ -41,18 +46,36 @@ class Style
             $attributes = [];
         }
 
+        if (isset($attributes['src'])) {
+            if (empty($attributes['rel'])) {
+                $attributes['rel'] = 'stylesheet';
+            }
+        }
+
         if (empty($attributes['type'])) {
             $attributes['type'] = 'text/css';
         }
 
-        $attr_html = '';
+        if ($this->options['scoped'] && empty($attributes['data-sade-class']) && !empty($this->options['id'])) {
+            $attributes['data-sade-class'] = $this->options['id'];
+        }
 
-        foreach ($attributes as $key => $value) {
-            if (empty($value)) {
-                $attr_html .= sprintf('%s ', $key);
-            } else {
-                $attr_html .= sprintf('%s="%s" ', $key, $value);
-            }
+        if (isset($attributes['scoped'])) {
+            unset($attributes['scoped']);
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Get style content.
+     *
+     * @return string
+     */
+    protected function content()
+    {
+        if (empty($this->options['content'])) {
+            return '';
         }
 
         $css = (new Parser($this->options['content']))->parse();
@@ -65,12 +88,92 @@ class Style
             }
         }
 
-        $content = $css->render();
+        return preg_replace('/\s+/', '', $css->render());
+    }
 
-        if (empty($content) && !isset($attributes['src'])) {
+    /**
+     * Render style html.
+     *
+     * @return string
+     */
+    public function render()
+    {
+        if ($this->options['tag'] === 'script') {
+            return $this->renderScript();
+        }
+
+        $content = $this->content();
+
+        if (empty($content)) {
             return '';
         }
 
+        $attributes = $this->attributes();
+        $attr_html = '';
+
+        foreach ($attributes as $key => $value) {
+            if (empty($value)) {
+                $attr_html .= sprintf('%s ', $key);
+            } else {
+                $attr_html .= sprintf('%s="%s" ', $key, $value);
+            }
+        }
+
         return sprintf('<style %s>%s</style>', $attr_html, $content);
+    }
+
+    /**
+     * Render CSS as a script tag.
+     *
+     * @return string
+     */
+    protected function renderScript()
+    {
+        $content = $this->content();
+
+        if (empty($content) && !isset($this->options['attributes']['src'])) {
+            return '';
+        }
+
+        $tag = isset($this->options['attributes']['src']) ? 'link' : 'style';
+        $attributes = $this->attributes();
+        $attr_script = '';
+
+        foreach ($attributes as $key => $value) {
+            $attr_script .= sprintf("elm.setAttribute('%s', '%s');\n", $key, $value);
+        }
+
+        $script = '
+        (function() {
+            var tag = "%s";
+            var elm = document.createElement(tag);
+
+            %s
+
+            if (tag === "style") {
+                var styles = "%s";
+
+                if (elm.styleSheet) {
+                    elm.styleSheet.cssText = styles;
+                } else {
+                    elm.appendChild(document.createTextNode(styles));
+                }
+            }
+
+            var s = document.getElementsByTagName(tag);
+            if (s.length) {
+                s[0].parentNode.appendChild(elm);
+            } else {
+                var head = document.getElementsByTagName("head");
+                head.length && head[0].appendChild(elm);
+            }
+        }());
+        ';
+
+        $content = sprintf($script, $tag, $attr_script, $content);
+
+        return (new Script([
+            'content' => $content,
+        ]))->render();
     }
 }

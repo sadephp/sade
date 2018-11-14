@@ -92,8 +92,10 @@ class Template
             $attributes = [];
         }
 
-        if (empty($attributes['id'])) {
-            $attributes['id'] = $this->options['id'];
+        if (empty($attributes['class'])) {
+            $attributes['class'] = $this->options['id'];
+        } else {
+            $attributes['class'] .= ' ' . $this->options['id'];
         }
 
         $attr_html = '';

@@ -1,3 +1,0 @@
-<template>
-    {{ children | raw }}
-</template>
