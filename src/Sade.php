@@ -264,8 +264,9 @@ class Sade
     {
         $file = $this->file($file);
         $hashids = new Hashids($file);
+        $id = $hashids->encode(1, 2, 3);
 
-        return 'sade-' . $hashids->encode(1, 2, 3);
+        return 'sade-' . strtolower($id);
     }
 
     /**

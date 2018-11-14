@@ -153,7 +153,27 @@ Example:
 CSS Output:
 
 ```css
-#sade-l3uvc2l0zxmv p {
+.sade-8lhpfz p {
+    font-size: 2em;
+    text-align: center;
+}
+```
+
+To style scoped div:
+
+```html
+<style scoped>
+    {
+        font-size: 2em;
+        text-align: center;
+    }
+</style>
+```
+
+CSS Output:
+
+```css
+.sade-8lhpfz {
     font-size: 2em;
     text-align: center;
 }
