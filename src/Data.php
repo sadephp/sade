@@ -65,7 +65,7 @@ class Data extends Config
                     continue;
                 }
 
-                $funcs[$key] = Closure::bind(function () use($func) {
+                $funcs[$key] = Closure::bind(function () use ($func) {
                     call_user_func(Closure::bind($func, $this));
                     return (array) $this;
                 }, $dataobj);
