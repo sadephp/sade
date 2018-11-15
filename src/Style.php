@@ -14,9 +14,11 @@ class Style
     protected $options = [
         'attributes' => [],
         'content'    => '',
+        'data'       => null,
         'id'         => '',
         'scoped'     => false,
         'tag'        => 'script',
+        'twig'       => true,
     ];
 
     /**
@@ -78,7 +80,16 @@ class Style
             return '';
         }
 
-        $css = (new Parser($this->options['content']))->parse();
+        $content = $this->options['content'];
+
+        if ($this->options['twig']) {
+            $content = (new Template([
+                'content' => $content,
+                'data'    => $this->options['data'],
+            ]))->render();
+        }
+
+        $css = (new Parser($content))->parse();
 
         if ($this->options['scoped']) {
             foreach ($css->getAllDeclarationBlocks() as $block) {

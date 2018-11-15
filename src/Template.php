@@ -16,9 +16,8 @@ class Template
     protected $options = [
         'attributes' => [],
         'content'    => '',
-        'filters'    => [],
+        'data'       => null,
         'id'         => '',
-        'methods'    => [],
         'scoped'     => false,
     ];
 
@@ -48,7 +47,11 @@ class Template
      */
     protected function registerFilters()
     {
-        foreach ($this->options['filters'] as $key => $value) {
+        if (empty($this->options['data'])) {
+            return;
+        }
+
+        foreach ($this->options['data']->get('filters') as $key => $value) {
             if (!is_callable($value)) {
                 continue;
             }
@@ -62,7 +65,11 @@ class Template
      */
     protected function registerMethods()
     {
-        foreach ($this->options['methods'] as $key => $value) {
+        if (empty($this->options['data'])) {
+            return;
+        }
+
+        foreach ($this->options['data']->get('methods') as $key => $value) {
             if (!is_callable($value)) {
                 continue;
             }
@@ -74,12 +81,11 @@ class Template
     /**
      * Render template.
      *
-     * @param  array $data
-     *
      * @return string
      */
-    public function render($data = [])
+    public function render()
     {
+        $data = empty($this->options['data']) ? [] : $this->options['data']->get('data');
         $html = $this->twig->render('component.sade', $data);
 
         if (!$this->options['scoped']) {

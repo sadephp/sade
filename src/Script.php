@@ -12,8 +12,10 @@ class Script
     protected $options = [
         'attributes' => [],
         'content'    => '',
+        'data'       => null,
         'id'         => '',
         'scoped'     => false,
+        'twig'       => true,
     ];
 
     /**
@@ -61,6 +63,13 @@ class Script
 
         if (empty($content) && !isset($attributes['src'])) {
             return '';
+        }
+
+        if (!isset($attributes['src']) && $this->options['twig']) {
+            $content = (new Template([
+                'content' => $content,
+                'data'    => $this->options['data'],
+            ]))->render();
         }
 
         if (!defined('SADE_DEV')) {

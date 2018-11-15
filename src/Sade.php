@@ -348,6 +348,11 @@ class Sade
         // Find attributes and types.
         list($attributes, $types) = $this->parseFileContent(file_get_contents($filepath));
 
+        // Call created function right before component will be created.
+        if ($newData = call_user_func($this->data->get('created'))) {
+            $this->data->set('data', $newData);
+        }
+
         $output = [];
 
         // Render template, script and style tags.
@@ -436,16 +441,14 @@ class Sade
     protected function renderTemplate($id, $attributes, $types)
     {
         $scoped = $this->scoped($attributes);
-        $data = $this->data->data;
 
         return (new Template([
             'attributes' => $attributes['template'],
             'content'    => $types['template'],
-            'filters'    => $this->data->filters,
+            'data'       => $this->data,
             'id'         => $id,
-            'methods'    => $this->data->methods,
             'scoped'     => $scoped ? $scoped : $this->options->get('template.scoped', false),
-        ]))->render($data);
+        ]))->render();
     }
 
     /**
@@ -464,6 +467,7 @@ class Sade
         return (new Script([
             'attributes' => $attributes['script'],
             'content'    => $types['script'],
+            'data'       => $this->data,
             'id'         => $id,
             'scoped'     => $scoped ? $scoped : $this->options->get('script.scoped', false),
         ]))->render();
@@ -483,6 +487,7 @@ class Sade
         return (new Style([
             'attributes' => $attributes['style'],
             'content'    => $types['style'],
+            'data'       => $this->data,
             'id'         => $id,
             'scoped'     => $this->scoped($attributes),
             'tag'        => $this->options->get('style.tag', 'script'),

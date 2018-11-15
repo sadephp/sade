@@ -65,7 +65,10 @@ class Data extends Config
                     continue;
                 }
 
-                $funcs[$key] = Closure::bind($func, $dataobj);
+                $funcs[$key] = Closure::bind(function () use($func) {
+                    call_user_func(Closure::bind($func, $this));
+                    return (array) $this;
+                }, $dataobj);
             }
 
             if (!$isarr) {
@@ -104,5 +107,51 @@ class Data extends Config
         }
 
         return [];
+    }
+
+    /**
+     * Get a configuration option.
+     *
+     * @param  string $name
+     *
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->get($key);
+    }
+
+    /**
+     * Determine if the given configuration option exists.
+     *
+     * @param  string $key
+     *
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        return $this->has($key);
+    }
+
+    /**
+     * Set a configuration option.
+     *
+     * @param  string $key
+     *
+     * @param  mixed  $value
+     */
+    public function __set($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    /**
+     * Unset a configuration option.
+     *
+     * @param  string $key
+     */
+    public function __unset($key)
+    {
+        $this->set($key, null);
     }
 }
