@@ -7,12 +7,20 @@ use Closure;
 class Data extends Config
 {
     /**
+     * Sade instance.
+     *
+     * @var \Sade\Sade
+     */
+    protected $sade = null;
+
+    /**
      * Create a new data.
      *
-     * @param array $data
-     * @param array $extra
+     * @param array      $data
+     * @param array      $extra
+     * @param \Sade\Sade $sade
      */
-    public function __construct(array $data = [], array $extra = [])
+    public function __construct(array $data = [], array $extra = [], $sade = null)
     {
         $defaults = [
             'created'    => function () {
@@ -24,6 +32,8 @@ class Data extends Config
             'methods'    => [],
             'props'      => [],
         ];
+
+        $this->sade = $sade;
 
         // Prepare component data.
         $data = array_replace_recursive($defaults, $data);
@@ -49,6 +59,7 @@ class Data extends Config
     protected function bindData(array $data)
     {
         $dataobj = (object) $data['data'];
+        $sade = $this->sade;
 
         foreach (['created', 'filters', 'methods'] as $name) {
             $funcs = $data[$name];
@@ -68,8 +79,8 @@ class Data extends Config
                 if ($isarr) {
                     $funcs[$key] = Closure::bind($func, $dataobj);
                 } else {
-                    $funcs[$key] = Closure::bind(function () use ($func) {
-                        call_user_func(Closure::bind($func, $this));
+                    $funcs[$key] = Closure::bind(function () use ($func, $sade) {
+                        call_user_func(Closure::bind($func, $this), $sade);
                         return (array) $this;
                     }, $dataobj);
                 }

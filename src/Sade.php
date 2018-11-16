@@ -218,7 +218,7 @@ class Sade
             $result = [];
         }
 
-        return new Data($result, $extra);
+        return new Data($result, $extra, $this);
     }
 
     /**
