@@ -188,6 +188,10 @@ PHP data use regulare `<?php ?>` tags. The returned array look like this:
 ```php
 <?php
     return [
+        'created'    => function() {
+            // Update data with new values when component is being rendered.
+            // Example: $this->ip = file_get_contents('https://api.ipify.org');
+        },
         'components' => [
             'image.php', // <image />
             'Parent' => 'parent.php' // <Parent />
