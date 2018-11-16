@@ -87,7 +87,7 @@ class Template
     public function render()
     {
         $data = empty($this->options['data']) ? [] : $this->options['data']->get('data');
-        $data['sade_class'] = $this->options['class'];
+        $data['sade_classname'] = $this->options['class'];
 
         $html = $this->twig->render($this->options['file'], $data);
 
