@@ -18,7 +18,60 @@ if (! $autoloader) {
 
 require_once $autoloader;
 
-$sade = new \Sade\Sade;
-$argv = array_slice($argv, 1);
+$climate = new League\CLImate\CLImate;
+$climate->arguments->add([
+    'src' => [
+        'prefix'      => 's',
+        'longPrefix'  => 'src',
+        'description' => 'Source directory, example: "examples/**/*.php"',
+    ],
+    'out' => [
+        'prefix'       => 'o',
+        'longPrefix'   => 'out',
+        'description'  => 'Output directory, example: build (default)',
+        'defaultValue' => 'build'
+    ],
+    'help' => [
+        'longPrefix'  => 'help',
+        'description' => 'Prints a usage statement',
+        'noValue'     => true,
+    ],
+]);
 
-print_r($sade->render($argv));
+$climate->arguments->parse();
+
+if ($climate->arguments->get('help')) {
+    $climate->usage();
+    exit;
+}
+
+$src = $climate->arguments->get('src');
+
+if (empty($src)) {
+    $climate->error('Source value is empty');
+    exit;
+}
+
+$dir  = getcwd();
+$out  = $climate->arguments->get('out');
+$sade = new Sade\Sade;
+
+foreach ($src as $arg) {
+    $path  = $dir . '/' . $arg;
+    $files = Webmozart\Glob\Glob::glob($path);
+
+    foreach ($files as $file) {
+        $path2 = $dir . '/' . ltrim($out, '/') . '/';
+        @mkdir($path2, 0755, false);
+
+        $path2 = str_replace('.php', '.html', $path2 . basename($file));
+
+        if (file_exists($path2)) {
+            unlink($path2);
+        }
+
+        $climate->out('Creating ' . $path2);
+
+        file_put_contents($path2, $sade->render($file));
+    }
+}

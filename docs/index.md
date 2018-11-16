@@ -74,12 +74,12 @@ echo $sade->only('script')->render('greeting.php');
 echo $sade->script('greeting.php');
 ```
 
-## Sade CLI 
+## Sade CLI
 
 Sade provides a simple CLI to render components through the terminal.
 
 ```
-vendor/bin/sade path/to/component.php > component.html
+vendor/bin/sade --src "components/**/*.php" --out build
 ```
 
 ## Components

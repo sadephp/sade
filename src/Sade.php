@@ -128,7 +128,7 @@ class Sade
             return [];
         }
 
-        if (!is_array($data->components)) {
+        if (! is_array($data->components)) {
             return [];
         }
 
@@ -141,7 +141,7 @@ class Sade
             }
 
             $reg = '/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/is';
-            if (!preg_match_all($reg, $template, $matches)) {
+            if (! preg_match_all($reg, $template, $matches)) {
                 continue;
             }
 
@@ -191,7 +191,7 @@ class Sade
         $result = require $this->file($file);
         ob_end_clean();
 
-        if (!is_array($result)) {
+        if (! is_array($result)) {
             $result = [];
         }
 
@@ -297,7 +297,7 @@ class Sade
         foreach (array_keys($types) as $key) {
             $reg = '/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/is';
 
-            if (!preg_match($reg, $contents, $matches)) {
+            if (! preg_match($reg, $contents, $matches)) {
                 continue;
             }
 
@@ -407,7 +407,12 @@ class Sade
         $dirs = explode('/', $file);
         $dirs = array_slice($dirs, 0, count($dirs) -1);
         $dirs = implode('/', $dirs);
-        $this->fileDir = implode('/', [$this->dir, $dirs]);
+
+        if (strpos($dirs, $this->dir) !== false) {
+            $this->fileDir = $dirs;
+        } else {
+            $this->fileDir = implode('/', [$this->dir, $dirs]);
+        }
 
         // Remove any path in file.
         $file = explode('/', $file);
