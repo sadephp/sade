@@ -230,7 +230,7 @@ class Sade
      */
     protected function file($file)
     {
-        if (file_exists(realpath($file))) {
+        if (file_exists(realpath($file)) && strpos($file, $this->fileDir) !== false) {
             return $file;
         }
 
