@@ -65,10 +65,14 @@ class Data extends Config
                     continue;
                 }
 
-                $funcs[$key] = Closure::bind(function () use ($func) {
-                    call_user_func(Closure::bind($func, $this));
-                    return (array) $this;
-                }, $dataobj);
+                if ($isarr) {
+                    $funcs[$key] = Closure::bind($func, $dataobj);
+                } else {
+                    $funcs[$key] = Closure::bind(function () use ($func) {
+                        call_user_func(Closure::bind($func, $this));
+                        return (array) $this;
+                    }, $dataobj);
+                }
             }
 
             if (!$isarr) {
