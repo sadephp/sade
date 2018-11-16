@@ -34,6 +34,13 @@ class SadeTest extends TestCase
         $this->assertSame('<span><p>Sade, world!</p></span>', $output);
     }
 
+    public function testCreatedRender()
+    {
+        $output = $this->sade->render('created.php');
+
+        $this->assertSame('<p>Created, world!</p>', $output);
+    }
+
     public function testMultipleFilesRender()
     {
         $output = $this->sade->render('accordion/accordion.php');
