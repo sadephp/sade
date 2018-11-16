@@ -182,6 +182,7 @@ class Style
         }());
         ';
 
+        $content = str_replace('"', '\"', $content);
         $content = sprintf($script, $tag, $attr_script, $content);
 
         return (new Script([
