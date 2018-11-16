@@ -52,26 +52,23 @@ if (empty($src)) {
     exit;
 }
 
-$dir  = getcwd();
-$out  = $climate->arguments->get('out');
-$sade = new Sade\Sade;
+$dir   = getcwd();
+$out   = $climate->arguments->get('out');
+$sade  = new Sade\Sade;
+$path  = $dir . '/' . $src;
+$files = Webmozart\Glob\Glob::glob($path);
 
-foreach ($src as $arg) {
-    $path  = $dir . '/' . $arg;
-    $files = Webmozart\Glob\Glob::glob($path);
+foreach ($files as $file) {
+    $path2 = $dir . '/' . ltrim($out, '/') . '/';
+    @mkdir($path2, 0755, false);
 
-    foreach ($files as $file) {
-        $path2 = $dir . '/' . ltrim($out, '/') . '/';
-        @mkdir($path2, 0755, false);
+    $path2 = str_replace('.php', '.html', $path2 . basename($file));
 
-        $path2 = str_replace('.php', '.html', $path2 . basename($file));
-
-        if (file_exists($path2)) {
-            unlink($path2);
-        }
-
-        $climate->out('Creating ' . $path2);
-
-        file_put_contents($path2, $sade->render($file));
+    if (file_exists($path2)) {
+        unlink($path2);
     }
-}
+
+    $climate->out('Creating ' . $path2);
+
+    file_put_contents($path2, $sade->render($file));
+    }
