@@ -22,6 +22,13 @@ class Sade
     protected $dir = '';
 
     /**
+     * Current component file.
+     *
+     * @var string
+     */
+    protected $file = '';
+
+    /**
      * File directory.
      *
      * @var string
@@ -336,7 +343,7 @@ class Sade
      */
     protected function preRender($file, array $data = [])
     {
-        $filepath = $this->file($file);
+        $this->file = $filepath = $this->file($file);
 
         if (!file_exists($filepath)) {
             return [];
@@ -451,6 +458,7 @@ class Sade
             'attributes' => $attributes['template'],
             'content'    => $types['template'],
             'data'       => $this->data,
+            'file'       => basename($this->file),
             'id'         => $id,
             'scoped'     => $scoped ? $scoped : $this->options->get('template.scoped', false),
         ]))->render();

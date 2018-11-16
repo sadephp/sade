@@ -17,6 +17,7 @@ class Template
         'attributes' => [],
         'content'    => '',
         'data'       => null,
+        'file'       => 'component.sade',
         'id'         => '',
         'scoped'     => false,
     ];
@@ -86,7 +87,7 @@ class Template
     public function render()
     {
         $data = empty($this->options['data']) ? [] : $this->options['data']->get('data');
-        $html = $this->twig->render('component.sade', $data);
+        $html = $this->twig->render($this->options['file'], $data);
 
         if (!$this->options['scoped']) {
             return $html;
@@ -122,10 +123,10 @@ class Template
      */
     protected function setupTwig()
     {
-        $loader = new Twig_Loader_Array([
-            'component.sade' => $this->options['content'],
-        ]);
+        $options = [];
+        $options[$this->options['file']] = $this->options['content'];
 
+        $loader = new Twig_Loader_Array($options);
         $this->twig = new Twig_Environment($loader);
     }
 }
