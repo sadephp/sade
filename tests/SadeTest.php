@@ -12,6 +12,13 @@ class SadeTest extends TestCase
         ]);
     }
 
+    public function testClassName()
+    {
+        $output = $this->sade->className(__DIR__ . '/testdata/components.php');
+
+        $this->assertSame('sade-0ghxfg', $output);
+    }
+
     public function testComponentsRender()
     {
         $output = $this->sade->render('components.php');
