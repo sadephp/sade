@@ -121,6 +121,22 @@ class Sade
     }
 
     /**
+     * Generate Sade classname.
+     *
+     * @param  string $file
+     *
+     * @return string
+     */
+    public function className($file)
+    {
+        $file = $this->file($file);
+        $hashids = new Hashids($file);
+        $hash = $hashids->encode(1, 2, 3);
+
+        return 'sade-' . strtolower($hash);
+    }
+
+    /**
      * Render components.
      *
      * @param  array $types
@@ -229,22 +245,6 @@ class Sade
     }
 
     /**
-     * Generate Sade id.
-     *
-     * @param  string $file
-     *
-     * @return string
-     */
-    public function id($file)
-    {
-        $file = $this->file($file);
-        $hashids = new Hashids($file);
-        $id = $hashids->encode(1, 2, 3);
-
-        return 'sade-' . strtolower($id);
-    }
-
-    /**
      * Set the only type (template, script or style) to include in the rendering.
      *
      * @param  string $type
@@ -350,7 +350,7 @@ class Sade
         }
 
         $this->data = $this->parent['data'] = $this->data($file, $data);
-        $id = $this->id($filepath);
+        $className = $this->className($filepath);
 
         // Find attributes and types.
         list($attributes, $types) = $this->parseFileContent(file_get_contents($filepath));
@@ -367,7 +367,7 @@ class Sade
             $enabled = $this->options->get(sprintf('%s.enabled', $tag), true);
             if ($enabled) {
                 $func = [$this, 'render' . ucfirst($tag)];
-                $res = call_user_func_array($func, [$id, $attributes, $types]);
+                $res = call_user_func_array($func, [$className, $attributes, $types]);
                 $output[$tag] = trim($res);
             }
         }
@@ -444,22 +444,22 @@ class Sade
     /**
      * Render template tag.
      *
-     * @param  string $id
+     * @param  string $className
      * @param  array  $attributes
      * @param  array  $types
      *
      * @return string
      */
-    protected function renderTemplate($id, $attributes, $types)
+    protected function renderTemplate($className, $attributes, $types)
     {
         $scoped = $this->scoped($attributes);
 
         return (new Template([
             'attributes' => $attributes['template'],
             'content'    => $types['template'],
+            'class'      => $className,
             'data'       => $this->data,
             'file'       => basename($this->file),
-            'id'         => $id,
             'scoped'     => $scoped ? $scoped : $this->options->get('template.scoped', false),
         ]))->render();
     }
@@ -467,21 +467,21 @@ class Sade
     /**
      * Render script tag.
      *
-     * @param  string $id
+     * @param  string $className
      * @param  array  $attributes
      * @param  array  $types
      *
      * @return string
      */
-    protected function renderScript($id, $attributes, $types)
+    protected function renderScript($className, $attributes, $types)
     {
         $scoped = $this->scoped($attributes);
 
         return (new Script([
             'attributes' => $attributes['script'],
             'content'    => $types['script'],
+            'class'      => $className,
             'data'       => $this->data,
-            'id'         => $id,
             'scoped'     => $scoped ? $scoped : $this->options->get('script.scoped', false),
         ]))->render();
     }
@@ -489,19 +489,19 @@ class Sade
     /**
      * Render style tag.
      *
-     * @param  string $id
+     * @param  string $className
      * @param  array  $attributes
      * @param  array  $types
      *
      * @return string
      */
-    protected function renderStyle($id, $attributes, $types)
+    protected function renderStyle($className, $attributes, $types)
     {
         return (new Style([
             'attributes' => $attributes['style'],
             'content'    => $types['style'],
+            'class'      => $className,
             'data'       => $this->data,
-            'id'         => $id,
             'scoped'     => $this->scoped($attributes),
             'tag'        => $this->options->get('style.tag', 'script'),
         ]))->render();

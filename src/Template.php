@@ -16,9 +16,9 @@ class Template
     protected $options = [
         'attributes' => [],
         'content'    => '',
+        'class'      => '',
         'data'       => null,
         'file'       => 'component.sade',
-        'id'         => '',
         'scoped'     => false,
     ];
 
@@ -87,6 +87,8 @@ class Template
     public function render()
     {
         $data = empty($this->options['data']) ? [] : $this->options['data']->get('data');
+        $data['sade_class'] = $this->options['class'];
+
         $html = $this->twig->render($this->options['file'], $data);
 
         if (!$this->options['scoped']) {
@@ -100,9 +102,9 @@ class Template
         }
 
         if (empty($attributes['class'])) {
-            $attributes['class'] = $this->options['id'];
+            $attributes['class'] = $this->options['class'];
         } else {
-            $attributes['class'] .= ' ' . $this->options['id'];
+            $attributes['class'] .= ' ' . $this->options['class'];
         }
 
         $attr_html = '';

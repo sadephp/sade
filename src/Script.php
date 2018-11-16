@@ -12,8 +12,8 @@ class Script
     protected $options = [
         'attributes' => [],
         'content'    => '',
+        'class'      => '',
         'data'       => null,
-        'id'         => '',
         'scoped'     => false,
         'twig'       => true,
     ];
@@ -45,8 +45,8 @@ class Script
             $attributes['type'] = 'text/javascript';
         }
 
-        if ($this->options['scoped'] && empty($attributes['data-sade-class']) && !empty($this->options['id'])) {
-            $attributes['data-sade-class'] = $this->options['id'];
+        if ($this->options['scoped'] && empty($attributes['data-sade-class']) && !empty($this->options['class'])) {
+            $attributes['data-sade-class'] = $this->options['class'];
         }
 
         $attr_html = '';
@@ -68,6 +68,7 @@ class Script
         if (!isset($attributes['src']) && $this->options['twig']) {
             $content = (new Template([
                 'content' => $content,
+                'class'   => $this->options['class'],
                 'data'    => $this->options['data'],
             ]))->render();
         }

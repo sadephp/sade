@@ -14,8 +14,8 @@ class Style
     protected $options = [
         'attributes' => [],
         'content'    => '',
+        'class'      => '',
         'data'       => null,
-        'id'         => '',
         'scoped'     => false,
         'tag'        => 'script',
         'twig'       => true,
@@ -58,8 +58,8 @@ class Style
             $attributes['type'] = 'text/css';
         }
 
-        if ($this->options['scoped'] && empty($attributes['data-sade-class']) && !empty($this->options['id'])) {
-            $attributes['data-sade-class'] = $this->options['id'];
+        if ($this->options['scoped'] && empty($attributes['data-sade-class']) && !empty($this->options['class'])) {
+            $attributes['data-sade-class'] = $this->options['class'];
         }
 
         if (isset($attributes['scoped'])) {
@@ -85,6 +85,7 @@ class Style
         if ($this->options['twig']) {
             $content = (new Template([
                 'content' => $content,
+                'class'   => $this->options['class'],
                 'data'    => $this->options['data'],
             ]))->render();
         }
@@ -94,7 +95,7 @@ class Style
         if ($this->options['scoped']) {
             foreach ($css->getAllDeclarationBlocks() as $block) {
                 foreach ($block->getSelectors() as $selector) {
-                    $selector->setSelector('.' . $this->options['id'] . ' ' . $selector->getSelector());
+                    $selector->setSelector('.' . $this->options['class'] . ' ' . $selector->getSelector());
                 }
             }
         }
