@@ -19,7 +19,7 @@ class SadeTest extends TestCase
 
     public function testChildrenRender()
     {
-        $output = $this->sade->render('children/index.php');
+        $output = $this->sade->render('children');
 
         $this->assertSame('<p>Hello, world!</p>', $output);
     }

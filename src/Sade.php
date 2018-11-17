@@ -143,6 +143,11 @@ class Sade extends Container
             return $output;
         }
 
+        // Default to `index.php` when only passing a directory.
+        if (is_dir($this->file($file))) {
+            $file = $file . '/index.php';
+        }
+
         // Store additional directories.
         $dirs = explode('/', $file);
         $dirs = array_slice($dirs, 0, count($dirs) -1);
@@ -160,6 +165,7 @@ class Sade extends Container
 
         $filepath = $this->file($file);
 
+        // Bail if file don't exists.
         if (!file_exists($filepath)) {
             return;
         }
