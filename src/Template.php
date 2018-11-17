@@ -15,9 +15,9 @@ class Template
      */
     protected $options = [
         'attributes' => [],
+        'component'  => null,
         'content'    => '',
         'class'      => '',
-        'data'       => null,
         'file'       => 'component.sade',
         'scoped'     => false,
     ];
@@ -48,11 +48,11 @@ class Template
      */
     protected function registerFilters()
     {
-        if (empty($this->options['data'])) {
+        if (empty($this->options['component'])) {
             return;
         }
 
-        foreach ($this->options['data']->get('filters') as $key => $value) {
+        foreach ($this->options['component']->get('filters') as $key => $value) {
             if (!is_callable($value)) {
                 continue;
             }
@@ -66,11 +66,11 @@ class Template
      */
     protected function registerMethods()
     {
-        if (empty($this->options['data'])) {
+        if (empty($this->options['component'])) {
             return;
         }
 
-        foreach ($this->options['data']->get('methods') as $key => $value) {
+        foreach ($this->options['component']->get('methods') as $key => $value) {
             if (!is_callable($value)) {
                 continue;
             }
@@ -86,7 +86,7 @@ class Template
      */
     public function render()
     {
-        $data = empty($this->options['data']) ? [] : $this->options['data']->get('data');
+        $data = empty($this->options['component']) ? [] : $this->options['component']->get('data');
         $data['sade_classname'] = $this->options['class'];
 
         $html = $this->twig->render($this->options['file'], $data);

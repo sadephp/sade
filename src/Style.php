@@ -13,12 +13,11 @@ class Style
      */
     protected $options = [
         'attributes' => [],
+        'component'  => null,
         'content'    => '',
         'class'      => '',
-        'data'       => null,
         'scoped'     => false,
         'tag'        => 'script',
-        'twig'       => true,
     ];
 
     /**
@@ -81,14 +80,11 @@ class Style
         }
 
         $content = $this->options['content'];
-
-        if ($this->options['twig']) {
-            $content = (new Template([
-                'content' => $content,
-                'class'   => $this->options['class'],
-                'data'    => $this->options['data'],
-            ]))->render();
-        }
+        $content = (new Template([
+            'component' => $this->options['component'],
+            'content'   => $content,
+            'class'     => $this->options['class'],
+        ]))->render();
 
         $css = (new Parser($content))->parse();
 

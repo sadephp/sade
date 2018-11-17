@@ -12,11 +12,9 @@ class SadeTest extends TestCase
         ]);
     }
 
-    public function testClassName()
+    public function tearDown()
     {
-        $output = $this->sade->className('components.php');
-
-        $this->assertRegExp('/sade\-\w+/', $output);
+        unset($this->sade);
     }
 
     public function testComponentsRender()
@@ -69,6 +67,19 @@ class SadeTest extends TestCase
         $output = $this->sade->only('script')->render('accordion/accordion.php');
 
         $this->assertTrue(strpos($output, '<div') === false && strpos($output, '<script') !== false && strpos($output, 'tag = "style"') === false);
+    }
+
+    public function testPluginRender()
+    {
+        $this->sade->bind('http', function($sade) {
+            return function ($url) {
+                return '1.1.1.1';
+            };
+        });
+
+        $output = $this->sade->render('ip.php');
+
+        $this->assertRegExp('/1\.1\.1\.1/', $output);
     }
 
     public function testRender()

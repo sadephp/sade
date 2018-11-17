@@ -2,8 +2,6 @@
 
 namespace Sade;
 
-use Closure;
-
 class Data extends Config
 {
     /**
@@ -14,118 +12,35 @@ class Data extends Config
     protected $sade = null;
 
     /**
-     * Create a new data.
+     * Data constructor.
      *
-     * @param array      $data
-     * @param array      $extra
      * @param \Sade\Sade $sade
+     * @param array      $data
      */
-    public function __construct(array $data = [], array $extra = [], $sade = null)
+    public function __construct($sade, array $data = [])
     {
-        $defaults = [
-            'created'    => function () {
-            },
-            'components' => [],
-            'data'       => function () {
-            },
-            'filters'    => [],
-            'methods'    => [],
-            'props'      => [],
-        ];
-
         $this->sade = $sade;
-
-        // Prepare component data.
-        $data = array_replace_recursive($defaults, $data);
-        $data['data'] = $this->extractData($data['data']);
-
-        // Prepare extra component data.
-        $extra = array_replace_recursive($defaults, $extra);
-        $data['data'] = array_replace_recursive($data['data'], $this->extractData($extra['data']));
-
-        $data = $this->bindData($data);
 
         parent::__construct($data);
     }
 
     /**
-     * Bind data to functions.
+     * Call dynamic methods.
      *
-     * @param  array $funcs
-     * @param  array $data
+     * @param  string $method
+     * @param  mixed  $parameters
      *
-     * @return array
+     * @return mixed
      */
-    protected function bindData(array $data)
+    public function __call($method, $parameters)
     {
-        $dataobj = (object) $data['data'];
-        $sade = $this->sade;
-
-        foreach (['created', 'filters', 'methods'] as $name) {
-            $funcs = $data[$name];
-
-            $isarr = is_array($funcs);
-
-            if (!$isarr) {
-                $funcs = [$funcs];
-            }
-
-            foreach ($funcs as $key => $func) {
-                if (!is_callable($func)) {
-                    unset($funcs[$key]);
-                    continue;
-                }
-
-                if ($isarr) {
-                    $funcs[$key] = Closure::bind($func, $dataobj);
-                } else {
-                    $funcs[$key] = Closure::bind(function () use ($func, $sade) {
-                        call_user_func(Closure::bind($func, $this), $sade);
-                        return (array) $this;
-                    }, $dataobj);
-                }
-            }
-
-            if (!$isarr) {
-                $funcs = $funcs[0];
-            }
-
-            $data[$name] = $funcs;
+        if ($this->sade->has($method)) {
+            return $this->sade->make($method, $parameters);
         }
-
-        return $data;
     }
 
     /**
-     * Extract data from data value.
-     *
-     * @param  mixed $data
-     *
-     * @return array
-     */
-    protected function extractData($data)
-    {
-        if (empty($data)) {
-            return [];
-        }
-
-        if (is_array($data)) {
-            return $data;
-        }
-
-        if (is_callable($data)) {
-            $data = call_user_func($data);
-        }
-
-        if (is_array($data)) {
-            return $data;
-        }
-
-        return [];
-    }
-
-    /**
-     * Get a configuration option.
+     * Get a data value.
      *
      * @param  string $name
      *
@@ -137,7 +52,7 @@ class Data extends Config
     }
 
     /**
-     * Determine if the given configuration option exists.
+     * Determine if the given data value exists.
      *
      * @param  string $key
      *
@@ -149,7 +64,7 @@ class Data extends Config
     }
 
     /**
-     * Set a configuration option.
+     * Set a data value.
      *
      * @param  string $key
      *
@@ -161,7 +76,7 @@ class Data extends Config
     }
 
     /**
-     * Unset a configuration option.
+     * Unset a data value.
      *
      * @param  string $key
      */

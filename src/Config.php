@@ -24,6 +24,16 @@ class Config implements ArrayAccess
     }
 
     /**
+     * Get configuration items.
+     *
+     * @return array
+     */
+    public function items()
+    {
+        return $this->items;
+    }
+
+    /**
      * Determine if a configuration has a value.
      *
      * @param  string $key
@@ -101,7 +111,7 @@ class Config implements ArrayAccess
 
             $name = array_shift($parts);
 
-            if (is_array($items[$name])) {
+            if (isset($items[$name]) && is_array($items[$name])) {
                 $items[$name] = array_replace_recursive($items[$name], $value);
             } else {
                 $items[$name] = $value;

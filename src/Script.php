@@ -11,11 +11,10 @@ class Script
      */
     protected $options = [
         'attributes' => [],
+        'component'  => null,
         'content'    => '',
         'class'      => '',
-        'data'       => null,
         'scoped'     => false,
-        'twig'       => true,
     ];
 
     /**
@@ -65,11 +64,11 @@ class Script
             return '';
         }
 
-        if (!isset($attributes['src']) && $this->options['twig']) {
+        if (!isset($attributes['src'])) {
             $content = (new Template([
-                'content' => $content,
-                'class'   => $this->options['class'],
-                'data'    => $this->options['data'],
+                'component' => $this->options['component'],
+                'content'   => $content,
+                'class'     => $this->options['class'],
             ]))->render();
         }
 

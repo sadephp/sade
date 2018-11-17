@@ -11,7 +11,7 @@
 
 return [
     'created' => function() {
-        $this->ip = file_get_contents('https://api.ipify.org');
+        $this->ip = $this->http('https://api.ipify.org');
     }
 ];
 
