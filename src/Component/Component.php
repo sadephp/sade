@@ -315,8 +315,6 @@ class Component
             }
         }
 
-        $this->rendered[$filepath] = $output;
-
         return $output;
     }
 

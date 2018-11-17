@@ -173,6 +173,8 @@ class Sade extends Container
 
         $output = $component->render($file, $data);
 
+        $this->rendered[$filepath] = $output;
+
         return trim(implode('', array_values($output)));
     }
 

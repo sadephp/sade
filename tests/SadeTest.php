@@ -47,6 +47,18 @@ class SadeTest extends TestCase
         $this->assertRegExp('/\<div\sclass\=\"sade\-\w+\"/', $output);
     }
 
+    public function testScriptAndStyleTagsCountRender()
+    {
+        $sade = new Sade(__DIR__ . '/testdata');
+        $output = $sade->render('accordion/accordion.php');
+        $output .= $sade->render('accordion/accordion.php');
+
+        $this->assertSame(1, substr_count($output, 'document.createElement'));
+
+        // Regular script + style script.
+        $this->assertSame(2, substr_count($output, '<script'));
+    }
+
     public function testMethodsRender()
     {
         $output = $this->sade->render('methods.php');
