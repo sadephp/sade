@@ -53,6 +53,7 @@ class SadeTest extends TestCase
         $output = $sade->render('accordion/accordion.php');
         $output .= $sade->render('accordion/accordion.php');
 
+        // Style script only once.
         $this->assertSame(1, substr_count($output, 'document.createElement'));
 
         // Regular script + style script.
