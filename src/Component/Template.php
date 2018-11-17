@@ -1,6 +1,6 @@
 <?php
 
-namespace Sade;
+namespace Sade\Component;
 
 use Twig_Environment;
 use Twig_Function;

@@ -1,8 +1,9 @@
 <?php
 
-namespace Sade;
+namespace Sade\Component;
 
 use Closure;
+use Sade\Config\Config;
 
 class Options extends Config
 {
@@ -59,7 +60,6 @@ class Options extends Config
     protected function bindData(array $data)
     {
         $dataobj = new Data($this->sade, $data['data']);
-        // $sade = $this->sade;
 
         foreach (['created', 'filters', 'methods'] as $name) {
             $funcs = $data[$name];

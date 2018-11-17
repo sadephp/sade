@@ -2,7 +2,7 @@
 
 namespace Sade;
 
-use Exception;
+use Sade\Config\Config;
 
 class Container extends Config
 {

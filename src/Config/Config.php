@@ -1,6 +1,6 @@
 <?php
 
-namespace Sade;
+namespace Sade\Config;
 
 use ArrayAccess;
 

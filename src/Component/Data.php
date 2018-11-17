@@ -1,6 +1,8 @@
 <?php
 
-namespace Sade;
+namespace Sade\Component;
+
+use Sade\Config\Config;
 
 class Data extends Config
 {

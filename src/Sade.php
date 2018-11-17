@@ -2,8 +2,8 @@
 
 namespace Sade;
 
-use Closure;
-use Hashids\Hashids;
+use Sade\Component\Component;
+use Sade\Config\Config;
 
 class Sade extends Container
 {

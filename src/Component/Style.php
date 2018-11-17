@@ -1,6 +1,6 @@
 <?php
 
-namespace Sade;
+namespace Sade\Component;
 
 use Sabberworm\CSS\Parser;
 
