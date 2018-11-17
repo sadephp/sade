@@ -17,6 +17,13 @@ class SadeTest extends TestCase
         unset($this->sade);
     }
 
+    public function testChildrenRender()
+    {
+        $output = $this->sade->render('children/index.php');
+
+        $this->assertSame('<p>Hello, world!</p>', $output);
+    }
+
     public function testComponentsRender()
     {
         $output = $this->sade->render('components.php');

@@ -157,11 +157,18 @@ class Component
 
                 $nextData = array_replace_recursive($nextData, $attributes);
 
-                // Append children values.
-                $nextData['children'] = $matches[1][$index];
+                // Render children value since it may contains twig code.
+                $children = $matches[1][$index];
+                $children = (new Template([
+                    'component' => $options,
+                    'content'   => $children,
+                ]))->render();
+
+                // Append children value to next component data.
+                $nextData['children'] = $children;
 
                 // Render child component.
-                $components[$before] = $this->render($file, [
+                $components[$reg] = $this->render($file, [
                     'data' => $nextData,
                 ]);
             }
@@ -308,10 +315,10 @@ class Component
         $components = $this->components($types);
 
         // Append all components in the right order.
-        foreach ($components as $key => $component) {
+        foreach ($components as $reg => $component) {
             foreach ($this->sade->tags() as $tag) {
                 if ($tag === 'template') {
-                    $output[$tag] = str_replace($key, $component[$tag], $output[$tag]);
+                    $output[$tag] = preg_replace($reg, $component[$tag], $output[$tag]);
                 } else {
                     $output[$tag] .= $component[$tag];
                 }
