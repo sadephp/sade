@@ -304,7 +304,7 @@ class Component
 
         // Render template, script and style tags.
         foreach ($this->sade->tags() as $tag) {
-            $enabled = $this->sade->options()->get(sprintf('%s.enabled', $tag), true);
+            $enabled = $this->sade->option(sprintf('%s.enabled', $tag), true);
             if ($enabled) {
                 $func = [$this, 'render' . ucfirst($tag)];
                 $res = call_user_func_array($func, [$className, $attributes, $types]);
@@ -347,7 +347,7 @@ class Component
             'content'    => $types['template'],
             'class'      => $className,
             'file'       => basename($this->file),
-            'scoped'     => $scoped ? $scoped : $this->sade->options()->get('template.scoped', false),
+            'scoped'     => $scoped ? $scoped : $this->sade->option('template.scoped', false),
         ]))->render();
     }
 
@@ -369,7 +369,7 @@ class Component
             'component'  => $this->options,
             'content'    => $types['script'],
             'class'      => $className,
-            'scoped'     => $scoped ? $scoped : $this->sade->options()->get('script.scoped', false),
+            'scoped'     => $scoped ? $scoped : $this->sade->option('script.scoped', false),
         ]))->render();
     }
 
@@ -390,7 +390,7 @@ class Component
             'content'    => $types['style'],
             'class'      => $className,
             'scoped'     => $this->scoped($attributes),
-            'tag'        => $this->sade->options()->get('style.tag', 'script'),
+            'tag'        => $this->sade->option('style.tag', 'script'),
         ]))->render();
     }
 
@@ -403,6 +403,6 @@ class Component
      */
     protected function scoped($attributes)
     {
-        return isset($attributes['style']['scoped']) ? true : $this->sade->options()->get('style.scoped', false);
+        return isset($attributes['style']['scoped']) ? true : $this->sade->option('style.scoped', false);
     }
 }

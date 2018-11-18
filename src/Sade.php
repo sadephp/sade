@@ -115,13 +115,16 @@ class Sade extends Container
     }
 
     /**
-     * Get options.
+     * Get a option value.
      *
-     * @return \Sade\Config
+     * @param  string $key
+     * @param  mixed  $default
+     *
+     * @return mixed
      */
-    public function options()
+    public function option($key, $default = null)
     {
-        return $this->options;
+        return $this->get(sprintf('options.%s', $key), $default);
     }
 
     /**
@@ -129,7 +132,7 @@ class Sade extends Container
      */
     protected function readCustomConfig()
     {
-        $file = $this->options->get('config.file');
+        $file = $this->option('config.file');
         $file = realpath($this->dir . '/' . basename($file));
 
         if (!file_exists($file)) {
@@ -192,7 +195,7 @@ class Sade extends Container
         }
 
         // Only render template tag if file already rendered.
-        if (!empty($this->rendered[$filepath]['template']) && $this->options['cache']) {
+        if (!empty($this->rendered[$filepath]['template']) && $this->option('cache')) {
             return $this->rendered[$filepath]['template'];
         }
 
@@ -251,7 +254,7 @@ class Sade extends Container
             ],
         ];
 
-        $this->options = new Config(array_replace_recursive($defaults, $options));
+        $this->set('options', array_replace_recursive($defaults, $options));
     }
 
     /**

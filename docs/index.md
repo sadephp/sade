@@ -45,8 +45,6 @@ The `enabled` value can be set to disable rendering of a type tag.
 $sade = new \Sade\Sade(__DIR__ . '/path/to/components', $options);
 ```
 
-You can always change options using `$sade->options` and it will return a new instance of Sade class.
-
 ## Render method
 
 To render a Sade component you create a new instanceof the `\Sade\Sade` class with the source directory where you're components exists. If no directory is given then `getcwd()` will be used.
