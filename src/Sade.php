@@ -133,7 +133,7 @@ class Sade extends Container
     protected function readCustomConfig()
     {
         $file = $this->option('config.file');
-        $file = realpath($this->dir . '/' . basename($file));
+        $file = realpath($this->dir . '/' . $file);
 
         if (!file_exists($file)) {
             return;
