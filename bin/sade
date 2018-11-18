@@ -62,7 +62,13 @@ foreach ($files as $file) {
     $path2 = $dir . '/' . ltrim($out, '/') . '/';
     @mkdir($path2, 0755, false);
 
-    $path2 = str_replace('.php', '.html', $path2 . basename($file));
+    if (basename($file) === 'index.php') {
+        $file  = basename(str_replace('index.php', '', $file));
+        $path2 = $path2 . $file . '.html';
+    } else {
+        $file  = basename($file);
+        $path2 = str_replace('.php', '.html', $path2 . $file);
+    }
 
     if (file_exists($path2)) {
         unlink($path2);
