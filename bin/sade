@@ -71,4 +71,4 @@ foreach ($files as $file) {
     $climate->out('Creating ' . $path2);
 
     file_put_contents($path2, $sade->render($file));
-    }
+}
