@@ -63,6 +63,7 @@ class Sade extends Container
     {
         $this->setupDir($dir);
         $this->setupOptions($options);
+        $this->readCustomConfig();
     }
 
     /**
@@ -121,6 +122,26 @@ class Sade extends Container
     public function options()
     {
         return $this->options;
+    }
+
+    /**
+     * Read custom config file.
+     */
+    protected function readCustomConfig()
+    {
+        $file = $this->options->get('config.file');
+        $file = realpath($this->dir . '/' . basename($file));
+
+        if (!file_exists($file)) {
+            return;
+        }
+
+        $customConfig = require $file;
+        if (!is_callable($customConfig)) {
+            return;
+        }
+
+        call_user_func($customConfig, $this);
     }
 
     /**
@@ -212,6 +233,9 @@ class Sade extends Container
     protected function setupOptions($options)
     {
         $defaults = [
+            'config'   => [
+                'file' => 'sade.php',
+            ],
             'cache'    => true,
             'script'   => [
                 'enabled' => true,

@@ -17,6 +17,11 @@ class SadeTest extends TestCase
         unset($this->sade);
     }
 
+    public function testCustomConfig()
+    {
+        $this->assertTrue($this->sade->get('custom'));
+    }
+
     public function testChildrenRender()
     {
         $output = $this->sade->render('children');
