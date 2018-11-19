@@ -121,4 +121,11 @@ class SadeTest extends TestCase
 
         $this->assertSame('<p>Sade, world!</p>', $output);
     }
+
+    public function testWithFunctionRender()
+    {
+        $output = $this->sade->render('app/app.php');
+
+        $this->assertContains('Provider prop: App Name', $output);
+    }
 }

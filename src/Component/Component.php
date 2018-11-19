@@ -142,8 +142,12 @@ class Component
 
             // Pass along proprties from parent component if requested.
             foreach ($this->options($file)->props as $key) {
-                if (isset($this->parent['attributes'][$key])) {
+                if (isset($this->parent['attributes'], $this->parent['attributes'][$key])) {
                     $nextData[$key] = $this->parent['attributes'][$key];
+                }
+
+                if (isset($this->parent['options'], $this->parent['options']->data[$key])) {
+                    $nextData[$key] = $this->parent['options']->data[$key];
                 }
 
                 if (isset($options->data[$key])) {
@@ -210,12 +214,17 @@ class Component
      */
     protected function options($file, array $extra = [])
     {
-        ob_start();
-        $result = require $this->file($file);
-        ob_end_clean();
+        if (!$this->sade->has($file)) {
+            ob_start();
+            $result = require $this->file($file);
+            ob_end_clean();
+            $this->sade->set($file, $result);
+        }
 
-        if (! is_array($result)) {
+        $result = $this->sade->get($file);
+        if (!is_array($result)) {
             $result = [];
+            $this->sade->set($file, null);
         }
 
         return new Options($result, $extra, $this->sade);
