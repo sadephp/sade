@@ -139,9 +139,10 @@ class Component
             }
 
             $nextData = [];
+            $nextOptions = $this->options($file);
 
             // Pass along proprties from parent component if requested.
-            foreach ($this->options($file)->props as $key) {
+            foreach (array_unique($nextOptions->props) as $key) {
                 if (isset($this->parent['attributes'], $this->parent['attributes'][$key])) {
                     $nextData[$key] = $this->parent['attributes'][$key];
                 }
