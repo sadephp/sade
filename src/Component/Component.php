@@ -349,7 +349,7 @@ class Component
      */
     protected function renderTemplate($className, $attributes, $types)
     {
-        $scoped = $this->scoped($attributes);
+        $scoped = $this->scopedTemplate($attributes);
 
         return (new Template([
             'attributes' => $attributes['template'],
@@ -372,7 +372,7 @@ class Component
      */
     protected function renderScript($className, $attributes, $types)
     {
-        $scoped = $this->scoped($attributes);
+        $scoped = $this->scopedTemplate($attributes);
 
         return (new Script([
             'attributes' => $attributes['script'],
@@ -399,20 +399,32 @@ class Component
             'component'  => $this->options,
             'content'    => $types['style'],
             'class'      => $className,
-            'scoped'     => $this->scoped($attributes),
+            'scoped'     => $this->scopedStyle($attributes),
             'tag'        => $this->sade->option('style.tag', 'script'),
         ]))->render();
     }
 
     /**
-     * Test if attributes contains a scoped style tag or is scoped by default.
+     * Determine if attributes contains a scoped style tag or is scoped by default.
      *
      * @param  array $attributes
      *
      * @return bool
      */
-    protected function scoped($attributes)
+    protected function scopedStyle($attributes)
     {
         return isset($attributes['style']['scoped']) ? true : $this->sade->option('style.scoped', false);
+    }
+
+    /**
+     * Determine if attributes contains a scoped template tag or is scoped by default.
+     *
+     * @param  array $attributes
+     *
+     * @return bool
+     */
+    protected function scopedTemplate($attributes)
+    {
+        return $this->scopedStyle($attributes) || isset($attributes['template']['scoped']) ? true : $this->sade->option('template.scoped', false);
     }
 }
