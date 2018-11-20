@@ -425,6 +425,10 @@ class Component
      */
     protected function scopedTemplate($attributes)
     {
-        return $this->scopedStyle($attributes) || isset($attributes['template']['scoped']) ? true : $this->sade->option('template.scoped', false);
+        if ($this->scopedStyle($attributes)) {
+            return true;
+        }
+
+        return isset($attributes['template']['scoped']) ? true : $this->sade->option('template.scoped', false);
     }
 }
