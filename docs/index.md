@@ -45,6 +45,23 @@ The `enabled` value can be set to disable rendering of a type tag.
 $sade = new \Sade\Sade(__DIR__ . '/path/to/components', $options);
 ```
 
+## Configuration files.
+
+When using the CLI or the [boilerplate](https://github.com/sadephp/boilerplate) you can configure Sade with a configuration file. When Sade is created it will look for `sade.php` in the directory passed and load it. If a function is returned it will send in the Sade instance as a argument.
+
+Example config file:
+
+```php
+<?php
+
+use Sade\Sade;
+
+return function(Sade $sade) {
+    // custom configuration.
+
+};
+```
+
 ## Render method
 
 To render a Sade component you create a new instanceof the `\Sade\Sade` class with the source directory where you're components exists. If no directory is given then `getcwd()` will be used.
@@ -127,15 +144,21 @@ If the `src` attribute starts with `//` or `http://` or `https://` it will rende
 
 The template tag contains [Twig](https://twig.symfony.com/doc/2.x/) (2.x) code and are compiled to HTML at runtime and cached if configured.
 
-All attributes will be passed along when template is scoped either via `template.scoped` or `style.scoped` or when a style tag has `scoped` attribute.
+All attributes will be passed along and a class will be added when template is:
+- scoped attribute on template tag or `template.scoped` option
+- scoped attrbiute on script tag or `script.scoped` option
+- scoped attrbitue on style tag or `style.scoped` option
 
 ### Script tag
 
-All attributes will be passed along and `data-sade-class` will be added with the div id when scoped.
+All attributes will be passed along and `data-sade-class` will be added when script is:
+- scoped attribute on template tag or `template.scoped` option
+- scoped attrbiute on script tag or `script.scoped` option
+- scoped attrbitue on style tag or `style.scoped` option
 
 ### Style tag
 
-All attributes will be passed along except scoped attribute. `data-sade-class` will be added with the div id when scoped. The style tag can scope CSS with a uniq class that is added to a div tag.
+All attributes will be passed along except scoped attribute. `data-sade-class` will be added with the div class name when scoped. The style tag will scope CSS with a uniq class name when scoped. Only scoped options from style tag will scope the CSS and not template or script scoped options.
 
 The style tag will be rendered by default but can be configured to be rendered as a style tag.
 
@@ -206,7 +229,8 @@ PHP data use regulare `<?php ?>` tags. The returned array look like this:
             // Twig functions.
         ],
         'props'      => [
-            // Requested props from parent component.
+            // Request props and data from parent component.
+            // Request data from top parent component.
         ]
     ];
 ?>
@@ -217,6 +241,28 @@ PHP data use regulare `<?php ?>` tags. The returned array look like this:
 * `data` are a function that returns a array or array of data.
 * `methods` are a key/function array for Twig functions. You can access data here `$this->greeting` equals `greetings` from data array.
 * `props` are a array of properties to request from the parent component. Only parent properties is needed to be listed, not properties on a component html tag.
+
+### Custom functions
+
+You can add custom functions or create plugins and bind them with:
+
+```php
+$sade->bind('http', function($sade) {
+    return function ($url) {
+        return file_get_contents($url);
+    };
+});
+```
+
+Then you can call them in `created, filters and methods` functions.
+
+```php
+return [
+    'created' => function() {
+        $this->ip = $this->http('https://api.ipify.org');
+    }
+];
+```
 
 ### Parent components
 
@@ -266,4 +312,24 @@ Example of parent component:
 <template>
     {{ children }}
 </template>
+```
+
+### Inherit functions
+
+Instead of a child component add property names to `props` array they can use a inherit function. The inherit function is a custom function you write.
+
+```php
+function withParent(array $options) {
+    if (!isset($options['props'])) {
+        $options['props'] = [];
+    }
+     $options['props'][] = 'name';
+     return $options;
+}
+```
+
+Example of child component options:
+
+```php
+return withParent([]);
 ```
