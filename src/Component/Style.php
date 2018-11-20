@@ -3,8 +3,9 @@
 namespace Sade\Component;
 
 use Sabberworm\CSS\Parser;
+use Sade\Contracts\Component\Tag;
 
-class Style
+class Style implements Tag
 {
     /**
      * Style options.

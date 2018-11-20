@@ -2,11 +2,12 @@
 
 namespace Sade\Component;
 
+use Sade\Contracts\Component\Tag;
 use Twig_Environment;
 use Twig_Function;
 use Twig_Loader_Array;
 
-class Template
+class Template implements Tag
 {
     /**
      * Template options.

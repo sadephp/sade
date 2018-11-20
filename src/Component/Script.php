@@ -2,7 +2,9 @@
 
 namespace Sade\Component;
 
-class Script
+use Sade\Contracts\Component\Tag;
+
+class Script implements Tag
 {
     /**
      * Script options.
