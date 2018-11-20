@@ -20,6 +20,12 @@ require_once $autoloader;
 
 $climate = new League\CLImate\CLImate;
 $climate->arguments->add([
+    'ext' => [
+        'prefix'       => 'e',
+        'longPrefix'   => 'ext',
+        'description'  => 'Extension of generated file',
+        'defaultValue' => 'html',
+    ],
     'src' => [
         'prefix'      => 's',
         'longPrefix'  => 'src',
@@ -28,7 +34,7 @@ $climate->arguments->add([
     'out' => [
         'prefix'       => 'o',
         'longPrefix'   => 'out',
-        'description'  => 'Output directory, example: build (default)',
+        'description'  => 'Output directory',
         'defaultValue' => 'build'
     ],
     'help' => [
@@ -53,28 +59,39 @@ if (empty($src)) {
 }
 
 $dir   = getcwd();
+$ext   = $climate->arguments->get('ext');
 $out   = $climate->arguments->get('out');
 $sade  = new Sade\Sade;
 $path  = $dir . '/' . $src;
 $files = Webmozart\Glob\Glob::glob($path);
 
 foreach ($files as $file) {
-    $path2 = $dir . '/' . ltrim($out, '/') . '/';
-    @mkdir($path2, 0755, false);
+    $dest = $dir . '/' . ltrim($out, '/') . '/';
+
+    @mkdir($dest, 0755, false);
 
     if (basename($file) === 'index.php') {
-        $file  = basename(str_replace('index.php', '', $file));
-        $path2 = $path2 . $file . '.html';
+        $file = basename(str_replace('index.php', '', $file));
+        $dest = $dest . $file . '.' . ltrim($ext, '.');
     } else {
-        $file  = basename($file);
-        $path2 = str_replace('.php', '.html', $path2 . $file);
+        $dest = str_replace('.php', '.' . ltrim($ext, '.'), $dest . basename($file));
     }
 
-    if (file_exists($path2)) {
-        unlink($path2);
+    if (empty(pathinfo($dest, PATHINFO_EXTENSION))) {
+       continue;
     }
 
-    $climate->out('Creating ' . $path2);
+    if (file_exists($dest)) {
+        unlink($dest);
+    }
 
-    file_put_contents($path2, $sade->render($file));
+    $output = $sade->render($file);
+
+    if (empty($output)) {
+        continue;
+    }
+
+    $climate->out('Creating ' . $dest);
+
+    file_put_contents($dest, $output);
 }
