@@ -23,8 +23,8 @@ Default options:
     'config'   => [
         'file' => 'sade.php',
     ],
-    // Will cache output html so if you render same component again only
-    // the html will be returned since you have the script and style tags already.
+    // Will cache output html so if you render same component again with only
+    // the html and not script and style tags again.
     'cache'    => true,
     'script'   => [
         // Point to your own script generator class.
