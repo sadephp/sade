@@ -3,23 +3,24 @@
 namespace Sade\Component;
 
 use Sade\Config\Config;
+use Sade\Contracts\Sade;
 
 class Data extends Config
 {
     /**
      * Sade instance.
      *
-     * @var \Sade\Sade
+     * @var \Sade\Contracts\Sade
      */
     protected $sade = null;
 
     /**
      * Data constructor.
      *
-     * @param \Sade\Sade $sade
-     * @param array      $data
+     * @param \Sade\Contracts\Sade $sade
+     * @param array                $data
      */
-    public function __construct($sade, array $data = [])
+    public function __construct(Sade $sade, array $data = [])
     {
         $this->sade = $sade;
 

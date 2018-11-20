@@ -3,9 +3,10 @@
 namespace Sade;
 
 use Sade\Component\Component;
+use Sade\Contracts\Sade as SadeContract;
 use Sade\Config\Config;
 
-class Sade extends Container
+class Sade extends Container implements SadeContract
 {
     /**
      * Components directory.
@@ -241,16 +242,20 @@ class Sade extends Container
             ],
             'cache'    => true,
             'script'   => [
+                'class'   => \Sade\Component\Script::class,
                 'enabled' => true,
+                'scoped'  => false,
             ],
             'style'    => [
+                'class'   => \Sade\Component\Style::class,
                 'enabled' => true,
                 'scoped'  => false,
                 'tag'     => 'script',
             ],
             'template' => [
+                'class'   => \Sade\Component\Template::class,
                 'enabled' => true,
-                'scoped'  => false
+                'scoped'  => false,
             ],
         ];
 

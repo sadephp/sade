@@ -4,22 +4,23 @@ namespace Sade\Component;
 
 use Closure;
 use Sade\Config\Config;
+use Sade\Contracts\Sade;
 
 class Options extends Config
 {
     /**
      * Sade instance.
      *
-     * @var \Sade\Sade
+     * @var \Sade\Contracts\Sade
      */
     protected $sade = null;
 
     /**
      * Create new options instance.
      *
-     * @param array      $options
-     * @param array      $extra
-     * @param \Sade\Sade $sade
+     * @param array                $options
+     * @param array                $extra
+     * @param \Sade\Contracts\Sade $sade
      */
     public function __construct(array $options = [], array $extra = [], $sade = null)
     {

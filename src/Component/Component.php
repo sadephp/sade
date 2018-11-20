@@ -3,6 +3,7 @@
 namespace Sade\Component;
 
 use Hashids\Hashids;
+use Sade\Contracts\Sade;
 
 class Component
 {
@@ -33,17 +34,17 @@ class Component
     /**
      * Sade instance.
      *
-     * @var \Sade\Sade
+     * @var \Sade\Contracts\Sade
      */
     protected $sade = null;
 
     /**
      * Component construct.
      *
-     * @param  \Sade\Sade $sade
-     * @param  string     $dir
+     * @param  \Sade\Contracts\Sade $sade
+     * @param  string               $dir
      */
-    public function __construct($sade, $dir)
+    public function __construct(Sade $sade, $dir)
     {
         $this->sade = $sade;
         $this->dir = $dir;
@@ -349,15 +350,19 @@ class Component
      */
     protected function renderTemplate($className, $attributes, $types)
     {
-        $scoped = $this->scopedTemplate($attributes);
+        $class = $this->sade->option('template.class');
 
-        return (new Template([
+        if (!class_exists($class)) {
+            return '';
+        }
+
+        return (new $class([
             'attributes' => $attributes['template'],
             'component'  => $this->options,
             'content'    => $types['template'],
             'class'      => $className,
             'file'       => basename($this->file),
-            'scoped'     => $scoped ? $scoped : $this->sade->option('template.scoped', false),
+            'scoped'     => $this->scopedTemplateOrScript($attributes),
         ]))->render();
     }
 
@@ -372,14 +377,18 @@ class Component
      */
     protected function renderScript($className, $attributes, $types)
     {
-        $scoped = $this->scopedTemplate($attributes);
+        $class = $this->sade->option('script.class');
 
-        return (new Script([
+        if (!class_exists($class)) {
+            return '';
+        }
+
+        return (new $class([
             'attributes' => $attributes['script'],
             'component'  => $this->options,
             'content'    => $types['script'],
             'class'      => $className,
-            'scoped'     => $scoped ? $scoped : $this->sade->option('script.scoped', false),
+            'scoped'     => $this->scopedTemplateOrScript($attributes),
         ]))->render();
     }
 
@@ -394,7 +403,13 @@ class Component
      */
     protected function renderStyle($className, $attributes, $types)
     {
-        return (new Style([
+        $class = $this->sade->option('style.class');
+
+        if (!class_exists($class)) {
+            return '';
+        }
+
+        return (new $class([
             'attributes' => $attributes['style'],
             'component'  => $this->options,
             'content'    => $types['style'],
@@ -413,22 +428,42 @@ class Component
      */
     protected function scopedStyle($attributes)
     {
-        return isset($attributes['style']['scoped']) ? true : $this->sade->option('style.scoped', false);
+        if (isset($attributes['style']['scoped'])) {
+            return true;
+        }
+
+        return $this->sade->option('style.scoped');
     }
 
     /**
-     * Determine if attributes contains a scoped template tag or is scoped by default.
+     * Determine if attributes contains a scoped template or script tag or is scoped by default.
      *
      * @param  array $attributes
      *
      * @return bool
      */
-    protected function scopedTemplate($attributes)
+    protected function scopedTemplateOrScript($attributes)
     {
         if ($this->scopedStyle($attributes)) {
             return true;
         }
 
-        return isset($attributes['template']['scoped']) ? true : $this->sade->option('template.scoped', false);
+        if (isset($attributes['script']['scoped'])) {
+            return true;
+        }
+
+        if ($this->sade->option('script.scoped')) {
+            return true;
+        }
+
+        if (isset($attributes['template']['scoped'])) {
+            return true;
+        }
+
+        if ($this->sade->option('template.scoped')) {
+            return true;
+        }
+
+        return false;
     }
 }

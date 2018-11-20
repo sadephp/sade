@@ -51,6 +51,22 @@ class SadeTest extends TestCase
         $this->assertSame('<p>Created, world!</p>', $output);
     }
 
+    public function testCustomTemplateTagClass()
+    {
+        require __DIR__ . '/testdata/CustomTemplateTag.php';
+
+        $sade = new Sade(__DIR__ . '/testdata', [
+            'cache'    => false,
+            'template' => [
+                'class' => 'CustomTemplateTag',
+            ]
+        ]);
+
+        $output = $sade->render('hello.php');
+
+        $this->assertSame('CustomTemplateTag', $output);
+    }
+
     public function testMultipleFilesRender()
     {
         $output = $this->sade->render('accordion/accordion.php');

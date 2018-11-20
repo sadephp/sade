@@ -12,7 +12,7 @@ interface Tag
     public function __construct(array $options = []);
 
     /**
-     * Render template.
+     * Render tag.
      *
      * @return string
      */
