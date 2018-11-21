@@ -20,7 +20,8 @@
         "sabberworm/php-css-parser": "^8.2",
         "hashids/hashids": "^2.0",
         "webmozart/glob": "^4.1",
-        "league/climate": "^3.4"
+        "league/climate": "^3.4",
+        "ivopetkov/html5-dom-document-php": "^1.1"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^3.3",

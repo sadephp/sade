@@ -241,21 +241,19 @@ class Sade extends Container implements SadeContract
                 'file' => 'sade.php',
             ],
             'cache'    => true,
+            'scoped'   => false,
             'script'   => [
                 'class'   => \Sade\Component\Script::class,
                 'enabled' => true,
-                'scoped'  => false,
             ],
             'style'    => [
                 'class'   => \Sade\Component\Style::class,
                 'enabled' => true,
-                'scoped'  => false,
                 'tag'     => 'script',
             ],
             'template' => [
                 'class'   => \Sade\Component\Template::class,
                 'enabled' => true,
-                'scoped'  => false,
             ],
         ];
 

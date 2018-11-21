@@ -3,6 +3,7 @@
 namespace Sade\Component;
 
 use Hashids\Hashids;
+use IvoPetkov\HTML5DOMDocument;
 use Sade\Contracts\Sade;
 
 class Component
@@ -58,12 +59,13 @@ class Component
      *
      * @return array
      */
-    protected function attributes($key, $content)
+    protected function attributes($key, $contents)
     {
+        $key = strtolower($key);
         $reg = '/<\s*' . $key . '([^>]*)>(?:(.*?)<\s*\/\s*' . $key .'>|)/';
         $data = [];
 
-        if (!preg_match_all($reg, $content, $matches)) {
+        if (!preg_match_all($reg, $contents, $matches)) {
             return $data;
         }
 
@@ -114,7 +116,7 @@ class Component
      *
      * @return array
      */
-    protected function components($types)
+    protected function components($templates)
     {
         $options = $this->options;
 
@@ -127,59 +129,60 @@ class Component
         }
 
         $components = [];
-        $template   = $types['template'];
         $templateClass = $this->sade->option('template.class');
 
-        foreach ($options->components as $key => $file) {
-            if (is_numeric($key)) {
-                $key = pathinfo($file, PATHINFO_FILENAME);
-            }
-
-            $reg = '/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/is';
-            if (! preg_match_all($reg, $template, $matches)) {
-                continue;
-            }
-
-            $nextData = [];
-            $nextOptions = $this->options($file);
-
-            // Pass along proprties from parent component if requested.
-            foreach (array_unique($nextOptions->props) as $key) {
-                if (isset($this->parent['attributes'], $this->parent['attributes'][$key])) {
-                    $nextData[$key] = $this->parent['attributes'][$key];
+        foreach ($templates as $template) {
+            foreach ($options->components as $key => $file) {
+                if (is_numeric($key)) {
+                    $key = pathinfo($file, PATHINFO_FILENAME);
                 }
 
-                if (isset($this->parent['options'], $this->parent['options']->data[$key])) {
-                    $nextData[$key] = $this->parent['options']->data[$key];
+                $reg = '/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/is';
+                if (! preg_match_all($reg, $template->innerHTML, $matches)) {
+                    continue;
                 }
 
-                if (isset($options->data[$key])) {
-                    $nextData[$key] = $options->data[$key];
-                }
-            }
+                $nextData = [];
+                $nextOptions = $this->options($file);
 
-            // Render components.
-            foreach ($matches[0] as $index => $before) {
-                $this->parent['attributes'] = $attributes = $this->attributes($key, $before);
+                // Pass along proprties from parent component if requested.
+                foreach (array_unique($nextOptions->props) as $key) {
+                    if (isset($this->parent['attributes'], $this->parent['attributes'][$key])) {
+                        $nextData[$key] = $this->parent['attributes'][$key];
+                    }
 
-                $nextData = array_replace_recursive($nextData, $attributes);
+                    if (isset($this->parent['options'], $this->parent['options']->data[$key])) {
+                        $nextData[$key] = $this->parent['options']->data[$key];
+                    }
 
-                // Render children value since it may contains twig code.
-                $children = $matches[1][$index];
-                if (class_exists($templateClass)) {
-                    $children = (new $templateClass([
-                        'component' => $options,
-                        'content'   => $children,
-                    ]))->render();
+                    if (isset($options->data[$key])) {
+                        $nextData[$key] = $options->data[$key];
+                    }
                 }
 
-                // Append children value to next component data.
-                $nextData['children'] = $children;
+                // Render components.
+                foreach ($matches[0] as $index => $before) {
+                    $this->parent['attributes'] = $attributes = $this->attributes($key, $before);
 
-                // Render child component.
-                $components[$reg] = $this->render($file, [
-                    'data' => $nextData,
-                ]);
+                    $nextData = array_replace_recursive($nextData, $attributes);
+
+                    // Render children value since it may contains twig code.
+                    $children = $matches[1][$index];
+                    if (class_exists($templateClass)) {
+                        $children = (new $templateClass([
+                            'component' => $options,
+                            'content'   => $children,
+                        ]))->render();
+                    }
+
+                    // Append children value to next component data.
+                    $nextData['children'] = $children;
+
+                    // Render child component.
+                    $components[$reg] = $this->render($file, [
+                        'data' => $nextData,
+                    ]);
+                }
             }
         }
 
@@ -244,45 +247,39 @@ class Component
      */
     protected function parseFileContent($contents)
     {
-        $attributes = $types = [];
+        $elements = [];
 
         foreach ($this->sade->tags() as $tag) {
-            $attributes[$tag] = [];
-            $types[$tag] = '';
+            $elements[$tag] = [];
         }
+
+        $dom = new HTML5DOMDocument;
+        $dom->loadHTML($contents);
 
         // Find template, script and style tags.
-        foreach (array_keys($types) as $key) {
-            $reg = '/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/is';
+        foreach ($this->sade->tags() as $tag) {
+            $matches = $dom->querySelectorAll($tag);
+            foreach ($matches as $match) {
+                $attributes = $match->getAttributes();
 
-            if (! preg_match($reg, $contents, $matches)) {
-                continue;
-            }
-
-            $attributes[$key] = $this->attributes($key, $matches[0]);
-
-            // Load source file if found.
-            if (count($matches) === 1 || empty($matches[1])) {
-                if (isset($attributes[$key]['src'])) {
-                    $src = $attributes[$key]['src'];
-
-                    if (isset($attributes[$key]['external'])) {
-                        unset($attributes[$key]['external']);
-                        continue;
-                    }
-
-                    unset($attributes[$key]['src']);
+                if (isset($attributes['src']) && !isset($attributes['external'])) {
+                    $src = $attributes['src'];
+                    $match->removeAttribute('src');
 
                     if (file_exists($this->file($src))) {
-                        $types[$key] = file_get_contents($this->file($src));
+                        $match->innerHTML = file_get_contents($this->file($src));
                     }
                 }
-            } else {
-                $types[$key] = $matches[1];
+
+                if (isset($attributes['external'])) {
+                    $match->removeAttribute('external');
+                }
+
+                $elements[$match->nodeName][] = $match;
             }
         }
 
-        return [$attributes, $types];
+        return $elements;
     }
 
     /**
@@ -304,8 +301,8 @@ class Component
         $this->options = $this->parent['options'] = $this->options($file, $options);
         $className = $this->className($filepath);
 
-        // Find attributes and types.
-        list($attributes, $types) = $this->parseFileContent(file_get_contents($filepath));
+        // Find elements.
+        $elements = $this->parseFileContent(file_get_contents($filepath));
 
         // Call created function right before component will be created.
         if ($newData = call_user_func($this->options->get('created'))) {
@@ -313,22 +310,55 @@ class Component
         }
 
         $output = [];
+        $templates = [];
+        $scoped = $this->sade->option('scoped', false);
 
-        // Render template, script and style tags.
+        // Find out if any element has scoped attribute.
         foreach ($this->sade->tags() as $tag) {
-            $enabled = $this->sade->option(sprintf('%s.enabled', $tag), true);
-            if ($enabled) {
-                $func = [$this, 'render' . ucfirst($tag)];
-                $res = call_user_func_array($func, [$className, $attributes, $types]);
-                $output[$tag] = trim($res);
+            foreach ($elements[$tag] as $element) {
+                if ($element->hasAttribute('scoped')) {
+                    $scoped = true;
+                    break;
+                }
             }
         }
 
-        $components = $this->components($types);
+        // Render template, script and style tags.
+        foreach ($this->sade->tags() as $tag) {
+            // Bail if tag shouldn't be rendered.
+            $enabled = $this->sade->option(sprintf('%s.enabled', $tag), true);
+            if (!$enabled) {
+                continue;
+            }
+
+            foreach ($elements[$tag] as $element) {
+                $element->removeAttribute('scoped');
+
+                if ($tag === 'template') {
+                    $templates[] = $element;
+                }
+
+                // Call tag render method.
+                $func = [$this, 'render' . ucfirst($tag)];
+                $res = call_user_func_array($func, [$className, $element, $scoped]);
+
+                if (!isset($output[$tag])) {
+                    $output[$tag] = '';
+                }
+
+                $output[$tag] .= trim($res);
+            }
+        }
+
+        $components = $this->components($templates);
 
         // Append all components in the right order.
         foreach ($components as $reg => $component) {
             foreach ($this->sade->tags() as $tag) {
+                if (!isset($output[$tag], $component[$tag])) {
+                    continue;
+                }
+
                 if ($tag === 'template') {
                     $output[$tag] = preg_replace($reg, $component[$tag], $output[$tag]);
                 } else {
@@ -344,26 +374,26 @@ class Component
      * Render template tag.
      *
      * @param  string $className
-     * @param  array  $attributes
-     * @param  array  $types
+     * @param  array  $elements
      *
      * @return string
      */
-    protected function renderTemplate($className, $attributes, $types)
+    protected function renderTemplate($className, $element, $scoped)
     {
         $class = $this->sade->option('template.class');
+        $attributes = $element->getAttributes();
 
         if (!class_exists($class)) {
             return '';
         }
 
         return (new $class([
-            'attributes' => $attributes['template'],
+            'attributes' => $attributes,
             'component'  => $this->options,
-            'content'    => $types['template'],
+            'content'    => $element->innerHTML,
             'class'      => $className,
             'file'       => basename($this->file),
-            'scoped'     => $this->scopedTemplateOrScript($attributes),
+            'scoped'     => $scoped,
         ]))->render();
     }
 
@@ -371,25 +401,25 @@ class Component
      * Render script tag.
      *
      * @param  string $className
-     * @param  array  $attributes
-     * @param  array  $types
+     * @param  array  $elements
      *
      * @return string
      */
-    protected function renderScript($className, $attributes, $types)
+    protected function renderScript($className, $element, $scoped)
     {
         $class = $this->sade->option('script.class');
+        $attributes = $element->getAttributes();
 
         if (!class_exists($class)) {
             return '';
         }
 
         return (new $class([
-            'attributes'    => $attributes['script'],
+            'attributes'    => $attributes,
             'component'     => $this->options,
-            'content'       => $types['script'],
+            'content'       => $element->innerHTML,
             'class'         => $className,
-            'scoped'        => $this->scopedTemplateOrScript($attributes),
+            'scoped'        => $scoped,
             'templateClass' => $this->sade->option('template.class'),
         ]))->render();
     }
@@ -398,75 +428,27 @@ class Component
      * Render style tag.
      *
      * @param  string $className
-     * @param  array  $attributes
-     * @param  array  $types
+     * @param  array  $elements
      *
      * @return string
      */
-    protected function renderStyle($className, $attributes, $types)
+    protected function renderStyle($className, $element, $scoped)
     {
         $class = $this->sade->option('style.class');
+        $attributes = $element->getAttributes();
 
         if (!class_exists($class)) {
             return '';
         }
 
         return (new $class([
-            'attributes'    => $attributes['style'],
+            'attributes'    => $attributes,
             'component'     => $this->options,
-            'content'       => $types['style'],
+            'content'       => $element->innerHTML,
             'class'         => $className,
-            'scoped'        => $this->scopedStyle($attributes),
+            'scoped'        => $scoped,
             'tag'           => $this->sade->option('style.tag', 'script'),
             'templateClass' => $this->sade->option('template.class'),
         ]))->render();
-    }
-
-    /**
-     * Determine if attributes contains a scoped style tag or is scoped by default.
-     *
-     * @param  array $attributes
-     *
-     * @return bool
-     */
-    protected function scopedStyle($attributes)
-    {
-        if (isset($attributes['style']['scoped'])) {
-            return true;
-        }
-
-        return $this->sade->option('style.scoped');
-    }
-
-    /**
-     * Determine if attributes contains a scoped template or script tag or is scoped by default.
-     *
-     * @param  array $attributes
-     *
-     * @return bool
-     */
-    protected function scopedTemplateOrScript($attributes)
-    {
-        if ($this->scopedStyle($attributes)) {
-            return true;
-        }
-
-        if (isset($attributes['script']['scoped'])) {
-            return true;
-        }
-
-        if ($this->sade->option('script.scoped')) {
-            return true;
-        }
-
-        if (isset($attributes['template']['scoped'])) {
-            return true;
-        }
-
-        if ($this->sade->option('template.scoped')) {
-            return true;
-        }
-
-        return false;
     }
 }
