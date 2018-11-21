@@ -149,7 +149,16 @@ Example:
 <style src="accordion.css" />
 ```
 
-If the `src` attribute starts with `//` or `http://` or `https://` it will render a normal script or style tag.
+If combining `src` with a `external` attribute, then `src` attribute will be passed along as a real `src` attribute and no inline content will be added.
+
+```html
+<!-- Inline -->
+<template src="accordion.twig" />
+<!-- Not Inline -->
+<script src="accordion.js" external />
+<!-- Not inline -->
+<style src="accordion.css" external />
+```
 
 ### Template tag
 

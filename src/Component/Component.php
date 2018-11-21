@@ -248,9 +248,6 @@ class Component
             $types[$tag] = '';
         }
 
-        // Regex for testing if a src starts with // or http[s]://.
-        $urlStartReg = '/^(?:\/\/|(http(s?))\:\/\/)/';
-
         // Find template, script and style tags.
         foreach (array_keys($types) as $key) {
             $reg = '/<\s*' . $key . '[^>]*>(?:(.*?)<\s*\/\s*' . $key .'>|)/is';
@@ -266,7 +263,8 @@ class Component
                 if (isset($attributes[$key]['src'])) {
                     $src = $attributes[$key]['src'];
 
-                    if (preg_match($urlStartReg, $src)) {
+                    if (isset($attributes[$key]['external'])) {
+                        unset($attributes[$key]['external']);
                         continue;
                     }
 

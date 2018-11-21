@@ -67,6 +67,14 @@ class SadeTest extends TestCase
         $this->assertSame('CustomTemplateTag', $output);
     }
 
+    public function testExternalSourceRender()
+    {
+        $output = $this->sade->render('accordion/external.php');
+
+        $this->assertContains('src="accordion.js"', $output);
+        $this->assertContains('var tag = "link"', $output);
+    }
+
     public function testMultipleFilesRender()
     {
         $output = $this->sade->render('accordion/accordion.php');
