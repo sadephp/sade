@@ -6,13 +6,13 @@
 
 <?php
     return [
-        'data' => function() {
+        'data' => function () {
             return [
                 'image' => 'https://php.net/images/logos/php-logo.svg'
             ];
         }
     ];
-?>
+    ?>
 
 <style>
     img {

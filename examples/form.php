@@ -15,7 +15,7 @@
 
 <?php
     return [
-        'data' => function() {
+        'data' => function () {
             return [
                 'name' => $_POST['name'] ?? '',
                 'greeting' => 'Hi',
@@ -23,4 +23,4 @@
             ];
         }
     ];
-?>
+    ?>

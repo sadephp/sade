@@ -11,7 +11,7 @@
 <?php
 
 return [
-    'created' => function() {
+    'created' => function () {
         $this->ip = $this->http('https://api.ipify.org');
     },
     'data' => [

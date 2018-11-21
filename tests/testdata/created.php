@@ -4,10 +4,10 @@
 
 <?php
 return [
-    'created' => function() {
+    'created' => function () {
         $this->greeting = 'Created';
     },
-    'data' => function() {
+    'data' => function () {
         return [
             'greeting' => 'Hello'
         ];

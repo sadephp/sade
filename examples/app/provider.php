@@ -18,7 +18,8 @@
 
 <?php
 
-function withProvider(array $options) {
+function withProvider(array $options)
+{
     if (!isset($options['props'])) {
         $options['props'] = [];
     }
@@ -29,7 +30,7 @@ function withProvider(array $options) {
 }
 
 return [
-    'data' => function() {
+    'data' => function () {
         return [];
     }
 ];

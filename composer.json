@@ -8,6 +8,9 @@
         "twig"
     ],
     "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
         "psr-4": {
             "Sade\\": "src/"
         }

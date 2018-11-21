@@ -120,7 +120,7 @@ class SadeTest extends TestCase
 
     public function testPluginRender()
     {
-        $this->sade->bind('http', function($sade) {
+        $this->sade->bind('http', function ($sade) {
             return function ($url) {
                 return '1.1.1.1';
             };

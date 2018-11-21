@@ -7,13 +7,13 @@ return [
     'props' => [
         'greeting',
     ],
-    'data'  => function() {
+    'data'  => function () {
         return [
             'greeting' => 'Hello'
         ];
     },
     'methods' => [
-        'greeting' => function() {
+        'greeting' => function () {
             return $this->greeting;
         },
     ],

@@ -19,7 +19,7 @@
 <?php
 
 return [
-    'data' => function() {
+    'data' => function () {
         return [
             'greeting' => 'Hello'
         ];

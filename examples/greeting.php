@@ -2,7 +2,7 @@
 
 <?php
     return [
-        'data' => function() {
+        'data' => function () {
             return [
                 'greeting' => 'Hello'
             ];
@@ -12,12 +12,12 @@
             'form.php',
         ],
         'methods' => [
-            'name' => function() {
+            'name' => function () {
                 return sprintf('%s Sandra!', $this->greeting);
             }
         ]
     ];
-?>
+    ?>
 
 <script>
     document.body.style.backgroundColor = 'red';

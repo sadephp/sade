@@ -10,7 +10,7 @@ return [
     'components' => [
         'Parent' => 'parent.php',
     ],
-    'data' => function() {
+    'data' => function () {
         return [
             'greeting' => 'Hello',
         ];

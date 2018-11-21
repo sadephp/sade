@@ -9,7 +9,7 @@ return [
     'props' => [
         'greeting',
     ],
-    'data'  => function() {
+    'data'  => function () {
         return [
             'greeting' => 'Hello'
         ];

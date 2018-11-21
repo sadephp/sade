@@ -5,7 +5,7 @@
 <?php
 
 return [
-    'data' => function() {
+    'data' => function () {
         return [];
     },
     'components' => [

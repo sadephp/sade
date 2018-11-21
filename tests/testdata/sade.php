@@ -2,6 +2,6 @@
 
 use Sade\Sade;
 
-return function(Sade $sade) {
+return function (Sade $sade) {
     $sade->set('custom', true);
 };
