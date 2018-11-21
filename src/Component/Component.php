@@ -128,6 +128,7 @@ class Component
 
         $components = [];
         $template   = $types['template'];
+        $templateClass = $this->sade->option('template.class');
 
         foreach ($options->components as $key => $file) {
             if (is_numeric($key)) {
@@ -165,10 +166,12 @@ class Component
 
                 // Render children value since it may contains twig code.
                 $children = $matches[1][$index];
-                $children = (new Template([
-                    'component' => $options,
-                    'content'   => $children,
-                ]))->render();
+                if (class_exists($templateClass)) {
+                    $children = (new $templateClass([
+                        'component' => $options,
+                        'content'   => $children,
+                    ]))->render();
+                }
 
                 // Append children value to next component data.
                 $nextData['children'] = $children;
