@@ -76,10 +76,6 @@ class Script implements Tag
             ]))->render();
         }
 
-        if (!defined('SADE_DEV')) {
-            $content = preg_replace('/\s+/', ' ', trim($content));
-        }
-
         return sprintf('<script %s>%s</script>', $attr_html, $content);
     }
 }
