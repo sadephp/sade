@@ -384,11 +384,12 @@ class Component
         }
 
         return (new $class([
-            'attributes' => $attributes['script'],
-            'component'  => $this->options,
-            'content'    => $types['script'],
-            'class'      => $className,
-            'scoped'     => $this->scopedTemplateOrScript($attributes),
+            'attributes'    => $attributes['script'],
+            'component'     => $this->options,
+            'content'       => $types['script'],
+            'class'         => $className,
+            'scoped'        => $this->scopedTemplateOrScript($attributes),
+            'templateClass' => $this->sade->option('template.class'),
         ]))->render();
     }
 
@@ -410,12 +411,13 @@ class Component
         }
 
         return (new $class([
-            'attributes' => $attributes['style'],
-            'component'  => $this->options,
-            'content'    => $types['style'],
-            'class'      => $className,
-            'scoped'     => $this->scopedStyle($attributes),
-            'tag'        => $this->sade->option('style.tag', 'script'),
+            'attributes'    => $attributes['style'],
+            'component'     => $this->options,
+            'content'       => $types['style'],
+            'class'         => $className,
+            'scoped'        => $this->scopedStyle($attributes),
+            'tag'           => $this->sade->option('style.tag', 'script'),
+            'templateClass' => $this->sade->option('template.class'),
         ]))->render();
     }
 

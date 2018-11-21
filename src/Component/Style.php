@@ -13,12 +13,13 @@ class Style implements Tag
      * @var array
      */
     protected $options = [
-        'attributes' => [],
-        'component'  => null,
-        'content'    => '',
-        'class'      => '',
-        'scoped'     => false,
-        'tag'        => 'script',
+        'attributes'    => [],
+        'component'     => null,
+        'content'       => '',
+        'class'         => '',
+        'scoped'        => false,
+        'tag'           => 'script',
+        'templateClass' => null,
     ];
 
     /**
@@ -81,11 +82,15 @@ class Style implements Tag
         }
 
         $content = $this->options['content'];
-        $content = (new Template([
-            'component' => $this->options['component'],
-            'content'   => $content,
-            'class'     => $this->options['class'],
-        ]))->render();
+
+        $class = $this->options['templateClass'];
+        if (class_exists($class)) {
+            $content = (new $class([
+                'component' => $this->options['component'],
+                'content'   => $content,
+                'class'     => $this->options['class'],
+            ]))->render();
+        }
 
         $css = (new Parser($content))->parse();
 

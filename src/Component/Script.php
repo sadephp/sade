@@ -12,11 +12,12 @@ class Script implements Tag
      * @var array
      */
     protected $options = [
-        'attributes' => [],
-        'component'  => null,
-        'content'    => '',
-        'class'      => '',
-        'scoped'     => false,
+        'attributes'    => [],
+        'component'     => null,
+        'content'       => '',
+        'class'         => '',
+        'scoped'        => false,
+        'templateClass' => null,
     ];
 
     /**
@@ -66,8 +67,9 @@ class Script implements Tag
             return '';
         }
 
-        if (!isset($attributes['src'])) {
-            $content = (new Template([
+        if (!isset($attributes['src']) && class_exists($this->options['templateClass'])) {
+            $class = $this->options['templateClass'];
+            $content = (new $class([
                 'component' => $this->options['component'],
                 'content'   => $content,
                 'class'     => $this->options['class'],
