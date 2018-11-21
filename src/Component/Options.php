@@ -31,7 +31,9 @@ class Options extends Config
             'data'       => function () {
             },
             'filters'    => [],
-            'methods'    => [],
+            'methods'    => [
+                'env' => 'env',
+            ],
             'props'      => [],
         ];
 
@@ -74,6 +76,10 @@ class Options extends Config
             foreach ($funcs as $key => $func) {
                 if (!is_callable($func)) {
                     unset($funcs[$key]);
+                    continue;
+                }
+
+                if (!($func instanceof Closure)) {
                     continue;
                 }
 

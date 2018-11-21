@@ -67,6 +67,13 @@ class SadeTest extends TestCase
         $this->assertSame('CustomTemplateTag', $output);
     }
 
+    public function testEnvRender()
+    {
+        $output = $this->sade->render('env.php');
+
+        $this->assertContains('Hello, world', $output);
+    }
+
     public function testExternalSourceRender()
     {
         $output = $this->sade->render('accordion/external.php');
