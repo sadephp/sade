@@ -8,7 +8,7 @@ Sade, a library for creating PHP Components with [Twig](https://twig.symfony.com
 
 ## Documentation
 
-The documentation is located [here](https://github.com/sadephp/sade/blob/master/docs/index.md)
+The documentation is located [here](https://sadephp.github.io)
 
 ## Example
 
