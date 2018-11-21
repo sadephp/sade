@@ -55,7 +55,7 @@ class Component
      * Extra attributes from html tags.
      *
      * @param  string $key
-     * @param  string $content
+     * @param  string $contents
      *
      * @return array
      */
@@ -375,6 +375,7 @@ class Component
      *
      * @param  string $className
      * @param  array  $elements
+     * @param  bool   $scoped
      *
      * @return string
      */
@@ -402,6 +403,7 @@ class Component
      *
      * @param  string $className
      * @param  array  $elements
+     * @param  bool   $scoped
      *
      * @return string
      */
@@ -429,6 +431,7 @@ class Component
      *
      * @param  string $className
      * @param  array  $elements
+     * @param  bool   $scoped
      *
      * @return string
      */
