@@ -35,6 +35,7 @@ class Options extends Config
                 'env' => 'env',
             ],
             'props'      => [],
+            'scoped'     => false,
         ];
 
         $this->sade = $sade;
