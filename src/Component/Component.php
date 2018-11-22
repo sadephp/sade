@@ -373,21 +373,17 @@ class Component
      */
     protected function renderTemplate($className, $element, $scoped)
     {
-        $class = $this->sade->option('template.class');
-        $attributes = $element->getAttributes();
-
-        if (!class_exists($class)) {
-            return '';
-        }
-
-        return (new $class([
-            'attributes' => $attributes,
-            'component'  => $this->options,
-            'content'    => $element->innerHTML,
-            'class'      => $className,
-            'file'       => basename($this->file),
-            'scoped'     => $scoped,
-        ], $this->sade))->render();
+        return $this->sade->make('options.template.class', [
+            [
+                'attributes' => $element->getAttributes(),
+                'component'  => $this->options,
+                'content'    => $element->innerHTML,
+                'class'      => $className,
+                'file'       => basename($this->file),
+                'scoped'     => $scoped,
+            ],
+            $this->sade
+        ])->render();
     }
 
     /**
@@ -401,22 +397,16 @@ class Component
      */
     protected function renderScript($className, $element, $scoped)
     {
-        $class = $this->sade->option('script.class');
-        $attributes = $element->getAttributes();
-
-        if (!class_exists($class)) {
-            return '';
-        }
-
-        $class = new $class([
-            'attributes' => $attributes,
-            'component'  => $this->options,
-            'content'    => $element->innerHTML,
-            'class'      => $className,
-            'scoped'     => $scoped,
-        ], $this->sade);
-
-        return $class->render();
+        return $this->sade->make('options.script.class', [
+            [
+                'attributes' => $element->getAttributes(),
+                'component'  => $this->options,
+                'content'    => $element->innerHTML,
+                'class'      => $className,
+                'scoped'     => $scoped,
+            ],
+            $this->sade
+        ])->render();
     }
 
     /**
@@ -430,20 +420,16 @@ class Component
      */
     protected function renderStyle($className, $element, $scoped)
     {
-        $class = $this->sade->option('style.class');
-        $attributes = $element->getAttributes();
-
-        if (!class_exists($class)) {
-            return '';
-        }
-
-        return (new $class([
-            'attributes' => $attributes,
-            'component'  => $this->options,
-            'content'    => $element->innerHTML,
-            'class'      => $className,
-            'scoped'     => $scoped,
-            'tag'        => $this->sade->option('style.tag', 'script'),
-        ], $this->sade))->render();
+        return $this->sade->make('options.style.class', [
+            [
+                'attributes' => $element->getAttributes(),
+                'component'  => $this->options,
+                'content'    => $element->innerHTML,
+                'class'      => $className,
+                'scoped'     => $scoped,
+                'tag'        => $this->sade->option('style.tag', 'script'),
+            ],
+            $this->sade
+        ])->render();
     }
 }
