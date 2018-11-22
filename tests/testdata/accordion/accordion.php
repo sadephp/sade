@@ -1,10 +1,11 @@
 <template src="accordion.twig" />
 <script src="accordion.js" />
-<style scoped src="accordion.css"></style>
+<style src="accordion.css"></style>
 
 <?php
 
 return [
+    'scoped' => true,
     'data' => function () {
         return [
             'greeting' => 'Hello'

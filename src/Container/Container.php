@@ -1,6 +1,6 @@
 <?php
 
-namespace Sade;
+namespace Sade\Container;
 
 use ReflectionClass;
 use Sade\Config\Config;

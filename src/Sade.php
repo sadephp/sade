@@ -6,6 +6,7 @@ use Sade\Bridges\Node;
 use Sade\Component\Component;
 use Sade\Contracts\Sade as SadeContract;
 use Sade\Config\Config;
+use Sade\Container\Container;
 
 class Sade extends Container implements SadeContract
 {

@@ -311,17 +311,9 @@ class Component
 
         $output = [];
         $templates = [];
-        $scoped = $this->sade->option('scoped', false);
 
-        // Find out if any element has scoped attribute.
-        foreach ($this->sade->tags() as $tag) {
-            foreach ($elements[$tag] as $element) {
-                if ($element->hasAttribute('scoped')) {
-                    $scoped = true;
-                    break;
-                }
-            }
-        }
+        // Determine if we should scope output.
+        $scoped = $this->sade->option('scoped', false) || $this->options->scoped;
 
         // Render template, script and style tags.
         foreach ($this->sade->tags() as $tag) {
