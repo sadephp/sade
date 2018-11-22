@@ -2,12 +2,11 @@
 
 namespace Sade\Component;
 
-use Sade\Contracts\Component\Tag;
 use Twig_Environment;
 use Twig_Function;
 use Twig_Loader_Array;
 
-class Template implements Tag
+class Template extends Tag
 {
     /**
      * Template options.
@@ -29,20 +28,6 @@ class Template implements Tag
      * @var \Twig_Environment
      */
     protected $twig;
-
-    /**
-     * Template construct.
-     *
-     * @param array $options
-     */
-    public function __construct(array $options = [])
-    {
-        $this->options = array_merge($this->options, $options);
-
-        $this->setupTwig();
-        $this->registerFilters();
-        $this->registerMethods();
-    }
 
     /**
      * Register filters.
@@ -87,6 +72,10 @@ class Template implements Tag
      */
     public function render()
     {
+        $this->setupTwig();
+        $this->registerFilters();
+        $this->registerMethods();
+
         $data = empty($this->options['component']) ? [] : $this->options['component']->get('data');
         $data['sade_classname'] = $this->options['class'];
 

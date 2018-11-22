@@ -172,7 +172,7 @@ class Component
                         $children = (new $templateClass([
                             'component' => $options,
                             'content'   => $children,
-                        ]))->render();
+                        ], $this->sade))->render();
                     }
 
                     // Append children value to next component data.
@@ -395,7 +395,7 @@ class Component
             'class'      => $className,
             'file'       => basename($this->file),
             'scoped'     => $scoped,
-        ]))->render();
+        ], $this->sade))->render();
     }
 
     /**
@@ -416,14 +416,15 @@ class Component
             return '';
         }
 
-        return (new $class([
-            'attributes'    => $attributes,
-            'component'     => $this->options,
-            'content'       => $element->innerHTML,
-            'class'         => $className,
-            'scoped'        => $scoped,
-            'templateClass' => $this->sade->option('template.class'),
-        ]))->render();
+        $class = new $class([
+            'attributes' => $attributes,
+            'component'  => $this->options,
+            'content'    => $element->innerHTML,
+            'class'      => $className,
+            'scoped'     => $scoped,
+        ], $this->sade);
+
+        return $class->render();
     }
 
     /**
@@ -445,13 +446,12 @@ class Component
         }
 
         return (new $class([
-            'attributes'    => $attributes,
-            'component'     => $this->options,
-            'content'       => $element->innerHTML,
-            'class'         => $className,
-            'scoped'        => $scoped,
-            'tag'           => $this->sade->option('style.tag', 'script'),
-            'templateClass' => $this->sade->option('template.class'),
-        ]))->render();
+            'attributes' => $attributes,
+            'component'  => $this->options,
+            'content'    => $element->innerHTML,
+            'class'      => $className,
+            'scoped'     => $scoped,
+            'tag'        => $this->sade->option('style.tag', 'script'),
+        ], $this->sade))->render();
     }
 }

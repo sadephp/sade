@@ -2,6 +2,8 @@
 
 namespace Sade\Contracts\Component;
 
+use Sade\Contracts\Sade;
+
 interface Tag
 {
     /**
@@ -9,7 +11,7 @@ interface Tag
      *
      * @param array $options
      */
-    public function __construct(array $options = []);
+    public function __construct(array $options, Sade $sade);
 
     /**
      * Render tag.

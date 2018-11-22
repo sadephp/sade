@@ -2,9 +2,7 @@
 
 namespace Sade\Component;
 
-use Sade\Contracts\Component\Tag;
-
-class Script implements Tag
+class Script extends Tag
 {
     /**
      * Script options.
@@ -12,23 +10,12 @@ class Script implements Tag
      * @var array
      */
     protected $options = [
-        'attributes'    => [],
-        'component'     => null,
-        'content'       => '',
-        'class'         => '',
-        'scoped'        => false,
-        'templateClass' => null,
+        'attributes' => [],
+        'component'  => null,
+        'content'    => '',
+        'class'      => '',
+        'scoped'     => false,
     ];
-
-    /**
-     * Script construct.
-     *
-     * @param array $options
-     */
-    public function __construct(array $options = [])
-    {
-        $this->options = array_merge($this->options, $options);
-    }
 
     /**
      * Render script html.
@@ -67,14 +54,17 @@ class Script implements Tag
             return '';
         }
 
-        if (!isset($attributes['src']) && class_exists($this->options['templateClass'])) {
-            $class = $this->options['templateClass'];
+        if (!isset($attributes['src'])) {
+            $class = $this->sade->option('template.class');
             $content = (new $class([
                 'component' => $this->options['component'],
                 'content'   => $content,
                 'class'     => $this->options['class'],
-            ]))->render();
+            ], $this->sade))->render();
         }
+
+        $node = $this->sade->get('sade.bridges.node');
+        $content = $node->run($content, 'script');
 
         return sprintf('<script %s>%s</script>', $attr_html, $content);
     }

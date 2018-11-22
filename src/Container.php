@@ -2,6 +2,7 @@
 
 namespace Sade;
 
+use ReflectionClass;
 use Sade\Config\Config;
 
 class Container extends Config
@@ -29,17 +30,23 @@ class Container extends Config
      */
     public function make($key, array $args = [])
     {
-        $func = $this->get($key);
-        if (empty($func) || !is_callable($func)) {
+        $value = $this->get($key);
+        if (empty($value)) {
             return;
         }
 
-        $func = call_user_func($func, $this);
-        if (!is_callable($func)) {
-            return;
+        if (is_callable($value)) {
+            $func = call_user_func($value, $this);
+
+            if (is_callable($func)) {
+                return call_user_func_array($func, $args);
+            }
         }
 
-        return call_user_func_array($func, $args);
+        if (class_exists($value)) {
+            $r = new ReflectionClass($value);
+            return $r->newInstanceArgs($args);
+        }
     }
 
     /**

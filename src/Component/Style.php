@@ -3,9 +3,8 @@
 namespace Sade\Component;
 
 use Sabberworm\CSS\Parser;
-use Sade\Contracts\Component\Tag;
 
-class Style implements Tag
+class Style extends Tag
 {
     /**
      * Style options.
@@ -13,28 +12,13 @@ class Style implements Tag
      * @var array
      */
     protected $options = [
-        'attributes'    => [],
-        'component'     => null,
-        'content'       => '',
-        'class'         => '',
-        'scoped'        => false,
-        'tag'           => 'script',
-        'templateClass' => null,
+        'attributes' => [],
+        'component'  => null,
+        'content'    => '',
+        'class'      => '',
+        'scoped'     => false,
+        'tag'        => 'script',
     ];
-
-    /**
-     * Style construct.
-     *
-     * @param array $options
-     */
-    public function __construct(array $options = [])
-    {
-        $this->options = array_merge($this->options, $options);
-
-        if (isset($this->options['attributes']['src'])) {
-            $this->options['tag'] = 'script';
-        }
-    }
 
     /**
      * Get attributes.
@@ -83,14 +67,17 @@ class Style implements Tag
 
         $content = $this->options['content'];
 
-        $class = $this->options['templateClass'];
+        $class = $this->sade->option('template.class');
         if (class_exists($class)) {
             $content = (new $class([
                 'component' => $this->options['component'],
                 'content'   => $content,
                 'class'     => $this->options['class'],
-            ]))->render();
+            ], $this->sade))->render();
         }
+
+        $node = $this->sade->get('sade.bridges.node');
+        $content = $node->run($content, 'style');
 
         $css = (new Parser($content))->parse();
 
@@ -112,6 +99,10 @@ class Style implements Tag
      */
     public function render()
     {
+        if (isset($this->options['attributes']['src'])) {
+            $this->options['tag'] = 'script';
+        }
+
         if ($this->options['tag'] === 'script') {
             return $this->renderScript();
         }
@@ -187,8 +178,14 @@ class Style implements Tag
         $content = str_replace('"', '\"', $content);
         $content = sprintf($script, $tag, $attr_script, $content);
 
-        return (new Script([
-            'content' => $content,
-        ]))->render();
+
+        $class = $this->sade->option('script.class');
+        if (class_exists($class)) {
+            return (new $class([
+                'content' => $content,
+            ], $this->sade))->render();
+        }
+
+        return '';
     }
 }

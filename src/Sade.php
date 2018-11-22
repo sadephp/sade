@@ -2,6 +2,7 @@
 
 namespace Sade;
 
+use Sade\Bridges\Node;
 use Sade\Component\Component;
 use Sade\Contracts\Sade as SadeContract;
 use Sade\Config\Config;
@@ -62,6 +63,7 @@ class Sade extends Container implements SadeContract
      */
     public function __construct($dir = '', array $options = [])
     {
+        $this->setupContainer();
         $this->setupDir($dir);
         $this->setupOptions($options);
         $this->readCustomConfig();
@@ -207,6 +209,14 @@ class Sade extends Container implements SadeContract
         $this->rendered[$filepath] = $output;
 
         return trim(implode('', array_values($output)));
+    }
+
+    /**
+     * Setup container.
+     */
+    protected function setupContainer()
+    {
+        $this->set('sade.bridges.node', new Node(getcwd()));
     }
 
     /**

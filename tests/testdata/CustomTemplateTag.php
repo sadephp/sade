@@ -1,18 +1,9 @@
 <?php
 
-use Sade\Contracts\Component\Tag;
+use Sade\Component\Tag;
 
-class CustomTemplateTag implements Tag
+class CustomTemplateTag extends Tag
 {
-    /**
-     * Template construct.
-     *
-     * @param array $options
-     */
-    public function __construct(array $options = [])
-    {
-    }
-
     /**
      * Render template.
      *
