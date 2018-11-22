@@ -13,7 +13,7 @@ return [
         ];
     },
     'methods' => [
-        'created' => function() {
+        'created' => function () {
             return 'Created';
         },
     ],

@@ -52,7 +52,7 @@ class Data extends Container
             $key = $this->callableName($key);
         }
 
-        parent::set($key,$value);
+        parent::set($key, $value);
     }
 
     /**
