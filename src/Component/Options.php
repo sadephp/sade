@@ -54,6 +54,35 @@ class Options extends Config
     }
 
     /**
+     * Set functions on data object for different function types.
+     *
+     * @param  \Sade\Component\Data $dataobj
+     * @param  array                $data
+     * @param  string               $name
+     */
+    protected function setFunctions($dataobj, $data, $name)
+    {
+        switch ($name) {
+            case 'created':
+                $this->setFunctions($dataobj, $data, 'filters');
+                $this->setFunctions($dataobj, $data, 'methods');
+                break;
+            case 'filters':
+                foreach ($data['methods'] as $key => $value) {
+                    $dataobj->set($key, $value);
+                }
+                break;
+            case 'methods':
+                foreach ($data['filters'] as $key => $value) {
+                    $dataobj->set($key, $value);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
      * Bind data to functions.
      *
      * @param  array $funcs
@@ -66,8 +95,11 @@ class Options extends Config
         $dataobj = new Data($this->sade, $data['data']);
 
         foreach (['created', 'filters', 'methods'] as $name) {
-            $funcs = $data[$name];
+            $this->setFunctions($dataobj, $data, $name);
+        }
 
+        foreach (['created', 'filters', 'methods'] as $name) {
+            $funcs = $data[$name];
             $isarr = is_array($funcs);
 
             if (!$isarr) {

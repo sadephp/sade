@@ -5,12 +5,17 @@
 <?php
 return [
     'created' => function () {
-        $this->greeting = 'Created';
+        $this->greeting = $this->created();
     },
     'data' => function () {
         return [
             'greeting' => 'Hello'
         ];
-    }
+    },
+    'methods' => [
+        'created' => function() {
+            return 'Created';
+        },
+    ],
 ];
 ?>
