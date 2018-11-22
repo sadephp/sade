@@ -85,7 +85,6 @@ class Options extends Config
     /**
      * Bind data to functions.
      *
-     * @param  array $funcs
      * @param  array $data
      *
      * @return array
