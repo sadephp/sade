@@ -55,12 +55,14 @@ class Script extends Tag
         }
 
         if (!isset($attributes['src'])) {
-            $class = $this->sade->option('template.class');
-            $content = (new $class([
-                'component' => $this->options['component'],
-                'content'   => $content,
-                'class'     => $this->options['class'],
-            ], $this->sade))->render();
+            $content = $this->sade->make('options.template.class', [
+                [
+                    'component' => $this->options['component'],
+                    'content'   => $content,
+                    'class'     => $this->options['class'],
+                ],
+                $this->sade
+            ])->render();
         }
 
         $node = $this->sade->get('sade.bridges.node');

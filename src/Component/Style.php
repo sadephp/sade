@@ -66,15 +66,14 @@ class Style extends Tag
         }
 
         $content = $this->options['content'];
-
-        $class = $this->sade->option('template.class');
-        if (class_exists($class)) {
-            $content = (new $class([
+        $content = $this->sade->make('options.template.class', [
+            [
                 'component' => $this->options['component'],
                 'content'   => $content,
                 'class'     => $this->options['class'],
-            ], $this->sade))->render();
-        }
+            ],
+            $this->sade
+        ])->render();
 
         $node = $this->sade->get('sade.bridges.node');
         $content = $node->run($content, 'style');
@@ -178,14 +177,11 @@ class Style extends Tag
         $content = str_replace('"', '\"', $content);
         $content = sprintf($script, $tag, $attr_script, $content);
 
-
-        $class = $this->sade->option('script.class');
-        if (class_exists($class)) {
-            return (new $class([
+        return $this->sade->make('options.script.class', [
+            [
                 'content' => $content,
-            ], $this->sade))->render();
-        }
-
-        return '';
+            ],
+            $this->sade
+        ])->render();
     }
 }
