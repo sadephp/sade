@@ -168,12 +168,13 @@ class Component
 
                     // Render children value since it may contains twig code.
                     $children = $matches[1][$index];
-                    if (class_exists($templateClass)) {
-                        $children = (new $templateClass([
+                    $children = $this->sade->make('options.template.class', [
+                        [
                             'component' => $options,
                             'content'   => $children,
-                        ], $this->sade))->render();
-                    }
+                        ],
+                        $this->sade
+                    ])->render();
 
                     // Append children value to next component data.
                     $nextData['children'] = $children;
