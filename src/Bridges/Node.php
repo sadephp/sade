@@ -2,7 +2,8 @@
 
 namespace Sade\Bridges;
 
-class Node {
+class Node
+{
     /**
      * Node file directory.
      *
@@ -23,7 +24,8 @@ class Node {
      * @param string $dir
      * @param string $file
      */
-    public function __construct($dir, $file = 'sade.js') {
+    public function __construct($dir, $file = 'sade.js')
+    {
         $this->dir = $dir;
         $this->file = $file;
     }
@@ -36,7 +38,8 @@ class Node {
      *
      * @return string
      */
-    public function run($code, $type) {
+    public function run($code, $type)
+    {
         $path = $this->dir . '/' . $this->file;
 
         if (!file_exists($path)) {
