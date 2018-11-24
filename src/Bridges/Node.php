@@ -42,7 +42,6 @@ class Node
 
         $this->file = $options['file'];
         $this->path = $options['path'];
-
     }
 
     /**
