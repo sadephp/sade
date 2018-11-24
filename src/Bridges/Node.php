@@ -19,15 +19,30 @@ class Node
     protected $file = '';
 
     /**
+     * Path to node binary.
+     *
+     * @var string
+     */
+    protected $path;
+
+    /**
      * Node constructor.
      *
      * @param string $dir
-     * @param string $file
+     * @param array  $options
      */
-    public function __construct($dir, $file = '')
+    public function __construct($dir, array $options = [])
     {
         $this->dir = $dir;
-        $this->file = empty($file) ? 'sade.js' : $file;
+
+        $options = array_merge($options, [
+            'file' => 'node.js',
+            'path' => 'node',
+        ]);
+
+        $this->file = $options['file'];
+        $this->path = $options['path'];
+
     }
 
     /**
@@ -40,13 +55,13 @@ class Node
      */
     public function run($code, $type)
     {
-        $path = $this->dir . '/' . $this->file;
+        $file = $this->dir . '/' . $this->file;
 
-        if (!file_exists($path)) {
+        if (!file_exists($file)) {
             return $code;
         }
 
-        $process = proc_open('node ' . $path, [
+        $process = proc_open(sprintf('%s %s', $this->path, $file), [
             ['pipe', 'r'],
             ['pipe', 'w'],
             ['pipe', 'w'],

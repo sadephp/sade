@@ -217,7 +217,7 @@ class Sade extends Container implements SadeContract
      */
     protected function setupContainer()
     {
-        $this->set('sade.bridges.node', new Node(getcwd(), $this->option('node.file')));
+        $this->set('sade.bridges.node', new Node(getcwd(), $this->option('node')));
     }
 
     /**
@@ -254,6 +254,7 @@ class Sade extends Container implements SadeContract
             'cache'    => true,
             'node'     => [
                 'file' => 'sade.js',
+                'path' => 'node',
             ],
             'scoped'   => false,
             'script'   => [
