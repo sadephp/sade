@@ -3,8 +3,6 @@ build
 cache
 composer.lock
 node_modules
-package.json
-package-lock.json
-sade.js
+/sade.js
 sade.php
 vendor

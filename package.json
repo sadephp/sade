@@ -1,0 +1,29 @@
+{
+  "name": "@sadephp/sade",
+  "description": "Bridge package between Sade and Node",
+  "keywords": [
+    "node",
+    "php",
+    "components",
+    "sade",
+    "bridge",
+    "communication"
+  ],
+  "author": {
+    "name": "Fredrik Forsmo",
+    "email": "fredrik.forsmo@gmail.com",
+    "url": "https://frozzare.com/"
+  },
+  "license": "MIT",
+  "repository": "github:sadephp/sade",
+  "main": "lib/sade",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "dependencies": {
+    "semistandard": "^13.0.1"
+  },
+  "scripts": {
+    "test": "semistandard lib"
+  }
+}
