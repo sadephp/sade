@@ -64,9 +64,9 @@ class Sade extends Container implements SadeContract
      */
     public function __construct($dir = '', array $options = [])
     {
-        $this->setupContainer();
         $this->setupDir($dir);
         $this->setupOptions($options);
+        $this->setupContainer();
         $this->readCustomConfig();
     }
 
@@ -217,7 +217,7 @@ class Sade extends Container implements SadeContract
      */
     protected function setupContainer()
     {
-        $this->set('sade.bridges.node', new Node(getcwd()));
+        $this->set('sade.bridges.node', new Node(getcwd(), $this->option('node.file')));
     }
 
     /**
@@ -252,6 +252,9 @@ class Sade extends Container implements SadeContract
                 'file' => 'sade.php',
             ],
             'cache'    => true,
+            'node'     => [
+                'file' => 'sade.js',
+            ],
             'scoped'   => false,
             'script'   => [
                 'class'   => \Sade\Component\Script::class,

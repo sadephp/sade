@@ -24,10 +24,10 @@ class Node
      * @param string $dir
      * @param string $file
      */
-    public function __construct($dir, $file = 'sade.js')
+    public function __construct($dir, $file = '')
     {
         $this->dir = $dir;
-        $this->file = $file;
+        $this->file = empty($file) ? 'sade.js' : $file;
     }
 
     /**
