@@ -245,7 +245,6 @@ class Component
             $mixins = [$mixins];
         }
 
-
         foreach ($mixins as $mixin) {
             if (is_array($mixin)) {
                 $extra = array_replace_recursive($extra, $mixin);
