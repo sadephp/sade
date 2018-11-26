@@ -40,6 +40,11 @@ class Options extends Config
         $this->sade = $sade;
 
         $options = array_replace_recursive($defaults, $options);
+
+        if (!isset($extra['data'])) {
+            $extra['data'] = [];
+        }
+
         $options = $this->mergeOptions($options, $extra);
         $options = $this->bindData($options);
 

@@ -3,6 +3,7 @@
 namespace Sade\Component;
 
 use Twig_Environment;
+use Twig_Filter;
 use Twig_Function;
 use Twig_Loader_Array;
 
