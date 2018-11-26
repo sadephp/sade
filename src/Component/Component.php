@@ -223,9 +223,11 @@ class Component
      */
     protected function options($file, array $extra = [])
     {
+        $file = $this->file($file);
+
         if (!$this->sade->has($file)) {
             ob_start();
-            $result = require $this->file($file);
+            $result = require $file;
             ob_end_clean();
             $this->sade->set($file, $result);
         }
@@ -238,7 +240,17 @@ class Component
 
         $mixins = $this->sade->get('mixins', []);
         $mixins = is_array($mixins) ? $mixins : [];
-        $extra = array_replace_recursive($extra, $mixins);
+
+        if (empty(array_filter(array_keys($mixins), 'is_numeric'))) {
+            $mixins = [$mixins];
+        }
+
+
+        foreach ($mixins as $mixin) {
+            if (is_array($mixin)) {
+                $extra = array_replace_recursive($extra, $mixin);
+            }
+        }
 
         return new Options($result, $extra, $this->sade);
     }
