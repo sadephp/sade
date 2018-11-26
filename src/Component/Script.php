@@ -55,7 +55,7 @@ class Script extends Tag
         }
 
         if (!isset($attributes['src'])) {
-            $content = $this->sade->make('options.template.class', [
+            $content = $this->sade->make('template.class', [
                 [
                     'component' => $this->options['component'],
                     'content'   => $content,

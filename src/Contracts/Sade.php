@@ -22,16 +22,6 @@ interface Sade
     public function only($type);
 
     /**
-     * Get a option value.
-     *
-     * @param  string $key
-     * @param  mixed  $default
-     *
-     * @return mixed
-     */
-    public function option($key, $default = null);
-
-    /**
      * Render component.
      *
      * @param  string $file

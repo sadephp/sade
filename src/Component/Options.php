@@ -45,9 +45,11 @@ class Options extends Config
         $options['data'] = $this->extractData($options['data']);
 
         // Prepare extra component data.
-        $extra = array_replace_recursive($defaults, $extra);
-        $options['data'] = array_replace_recursive($options['data'], $this->extractData($extra['data']));
+        if (isset($extra['data'])) {
+            $extra['data'] = $this->extractData($extra['data']);
+        }
 
+        $options = array_replace_recursive($options, $extra);
         $options = $this->bindData($options);
 
         parent::__construct($options);

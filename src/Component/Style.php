@@ -66,7 +66,7 @@ class Style extends Tag
         }
 
         $content = $this->options['content'];
-        $content = $this->sade->make('options.template.class', [
+        $content = $this->sade->make('template.class', [
             [
                 'component' => $this->options['component'],
                 'content'   => $content,
@@ -177,7 +177,7 @@ class Style extends Tag
         $content = str_replace('"', '\"', $content);
         $content = sprintf($script, $tag, $attr_script, $content);
 
-        return $this->sade->make('options.script.class', [
+        return $this->sade->make('script.class', [
             [
                 'content' => $content,
             ],

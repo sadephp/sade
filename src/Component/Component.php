@@ -129,7 +129,7 @@ class Component
         }
 
         $components = [];
-        $templateClass = $this->sade->option('template.class');
+        $templateClass = $this->sade->get('template.class');
 
         foreach ($templates as $template) {
             foreach ($options->components as $key => $file) {
@@ -168,7 +168,7 @@ class Component
 
                     // Render children value since it may contains twig code.
                     $children = $matches[1][$index];
-                    $children = $this->sade->make('options.template.class', [
+                    $children = $this->sade->make('template.class', [
                         [
                             'component' => $options,
                             'content'   => $children,
@@ -235,6 +235,10 @@ class Component
             $result = [];
             $this->sade->set($file, null);
         }
+
+        $mixins = $this->sade->get('mixins', []);
+        $mixins = is_array($mixins) ? $mixins : [];
+        $extra = array_replace_recursive($extra, $mixins);
 
         return new Options($result, $extra, $this->sade);
     }
@@ -314,12 +318,12 @@ class Component
         $templates = [];
 
         // Determine if we should scope output.
-        $scoped = $this->sade->option('scoped', false) || $this->options->scoped;
+        $scoped = $this->sade->get('scoped', false) || $this->options->scoped;
 
         // Render template, script and style tags.
         foreach ($this->sade->tags() as $tag) {
             // Bail if tag shouldn't be rendered.
-            $enabled = $this->sade->option(sprintf('%s.enabled', $tag), true);
+            $enabled = $this->sade->get(sprintf('%s.enabled', $tag), true);
             if (!$enabled) {
                 continue;
             }
@@ -374,7 +378,7 @@ class Component
      */
     protected function renderTemplate($className, $element, $scoped)
     {
-        return $this->sade->make('options.template.class', [
+        return $this->sade->make('template.class', [
             [
                 'attributes' => $element->getAttributes(),
                 'component'  => $this->options,
@@ -398,7 +402,7 @@ class Component
      */
     protected function renderScript($className, $element, $scoped)
     {
-        return $this->sade->make('options.script.class', [
+        return $this->sade->make('script.class', [
             [
                 'attributes' => $element->getAttributes(),
                 'component'  => $this->options,
@@ -421,14 +425,14 @@ class Component
      */
     protected function renderStyle($className, $element, $scoped)
     {
-        return $this->sade->make('options.style.class', [
+        return $this->sade->make('style.class', [
             [
                 'attributes' => $element->getAttributes(),
                 'component'  => $this->options,
                 'content'    => $element->innerHTML,
                 'class'      => $className,
                 'scoped'     => $scoped,
-                'tag'        => $this->sade->option('style.tag', 'script'),
+                'tag'        => $this->sade->get('style.tag', 'script'),
             ],
             $this->sade
         ])->render();

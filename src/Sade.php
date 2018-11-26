@@ -119,31 +119,21 @@ class Sade extends Container implements SadeContract
     }
 
     /**
-     * Get a option value.
-     *
-     * @param  string $key
-     * @param  mixed  $default
-     *
-     * @return mixed
-     */
-    public function option($key, $default = null)
-    {
-        return $this->get(sprintf('options.%s', $key), $default);
-    }
-
-    /**
      * Read custom config file.
      */
     protected function readCustomConfig()
     {
-        $file = $this->option('config.file');
-        $file = realpath($this->dir . '/' . $file);
+        $file = $this->get('config.file');
+        $path = realpath($file);
+        if (!file_exists($path)) {
+            $path = realpath($this->dir . '/' . $file);
+        }
 
-        if (!file_exists($file)) {
+        if (!file_exists($path)) {
             return;
         }
 
-        $customConfig = require $file;
+        $customConfig = require $path;
         if (!is_callable($customConfig)) {
             return;
         }
@@ -199,7 +189,7 @@ class Sade extends Container implements SadeContract
         }
 
         // Only render template tag if file already rendered.
-        if (!empty($this->rendered[$filepath]['template']) && $this->option('cache')) {
+        if (!empty($this->rendered[$filepath]['template']) && $this->get('cache')) {
             return $this->rendered[$filepath]['template'];
         }
 
@@ -217,7 +207,7 @@ class Sade extends Container implements SadeContract
      */
     protected function setupContainer()
     {
-        $this->set('sade.bridges.node', new Node(getcwd(), $this->option('node')));
+        $this->set('sade.bridges.node', new Node(getcwd(), $this->get('node')));
     }
 
     /**
@@ -272,7 +262,7 @@ class Sade extends Container implements SadeContract
             ],
         ];
 
-        $this->set('options', array_replace_recursive($defaults, $options));
+        $this->set(array_replace_recursive($defaults, $options));
     }
 
     /**

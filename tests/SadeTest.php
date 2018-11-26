@@ -22,6 +22,15 @@ class SadeTest extends TestCase
         $this->assertTrue($this->sade->get('custom'));
     }
 
+    public function testMixinsRender()
+    {
+        $this->assertNotEmpty($this->sade->get('mixins'));
+
+        $output = $this->sade->render('mixins.php');
+
+        $this->assertSame('<p>Hello, world!</p>', $output);
+    }
+
     public function testChildrenRender()
     {
         $output = $this->sade->render('children');
