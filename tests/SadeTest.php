@@ -28,7 +28,9 @@ class SadeTest extends TestCase
 
         $output = $this->sade->render('mixins.php');
 
-        $this->assertSame('<p>Hello, world!</p>', $output);
+        $this->assertContains('<p>Hello, world!</p>', $output);
+        $this->assertContains('<p>mixin created</p>', $output);
+        $this->assertContains('<p>created</p>', $output);
     }
 
     public function testChildrenRender()

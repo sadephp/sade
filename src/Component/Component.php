@@ -321,8 +321,10 @@ class Component
         $elements = $this->parseFileContent(file_get_contents($filepath));
 
         // Call created function right before component will be created.
-        if ($newData = call_user_func($this->options->get('created'))) {
-            $this->options->set('data', $newData);
+        foreach ($this->options->get('created', []) as $createdFunc) {
+            if ($newData = call_user_func($createdFunc)) {
+                $this->options->set('data', $newData);
+            }
         }
 
         $output = [];
