@@ -60,6 +60,10 @@ class Node
             return $code;
         }
 
+        if (empty($code)) {
+            return $code;
+        }
+
         $process = proc_open(sprintf('%s %s', $this->path, $file), [
             ['pipe', 'r'],
             ['pipe', 'w'],
