@@ -35,10 +35,10 @@ class Node
     {
         $this->dir = $dir;
 
-        $options = array_merge($options, [
+        $options = array_merge([
             'file' => 'node.js',
             'path' => 'node',
-        ]);
+        ], $options);
 
         $this->file = $options['file'];
         $this->path = $options['path'];
