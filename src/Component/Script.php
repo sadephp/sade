@@ -40,8 +40,6 @@ class Script extends Tag
             }
         }
 
-        $attributes = $this->options['attributes'];
-
         if (empty($attributes['type'])) {
             $attributes['type'] = 'text/javascript';
         }
