@@ -39,9 +39,12 @@ class Style extends Tag
             }
 
             $path = $this->sade->get('url.base_path');
-            $path = rtrim($path, '/');
-            $src = ltrim($attributes['src'], '/');
-            $attributes['src'] = sprintf('%s/%s', $path, $src);
+
+            if (!empty($path)) {
+                $path = rtrim($path, '/');
+                $src = ltrim($attributes['src'], '/');
+                $attributes['src'] = sprintf('%s/%s', $path, $src);
+            }
         }
 
         if (empty($attributes['type'])) {

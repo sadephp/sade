@@ -32,9 +32,12 @@ class Script extends Tag
 
         if (isset($attributes['src'])) {
             $path = $this->sade->get('url.base_path');
-            $path = rtrim($path, '/');
-            $src = ltrim($attributes['src'], '/');
-            $attributes['src'] = sprintf('%s/%s', $path, $src);
+
+            if (!empty($path)) {
+                $path = rtrim($path, '/');
+                $src = ltrim($attributes['src'], '/');
+                $attributes['src'] = sprintf('%s/%s', $path, $src);
+            }
         }
 
         $attributes = $this->options['attributes'];
