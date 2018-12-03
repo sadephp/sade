@@ -95,6 +95,7 @@ class SadeTest extends TestCase
 
         $this->assertContains('src="accordion.js"', $output);
         $this->assertContains('var tag = "link"', $output);
+        $this->assertContains('elm.setAttribute(\'href\'', $output);
     }
 
     public function testMultipleFilesRender()

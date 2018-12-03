@@ -144,6 +144,10 @@ class Style extends Tag
         $attr_script = '';
 
         foreach ($attributes as $key => $value) {
+            if ($tag === 'link' && $key === 'src') {
+                $key = 'href';
+            }
+
             $attr_script .= sprintf("elm.setAttribute('%s', '%s');\n", $key, $value);
         }
 
