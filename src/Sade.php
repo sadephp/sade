@@ -260,6 +260,9 @@ class Sade extends Container implements SadeContract
                 'class'   => \Sade\Component\Template::class,
                 'enabled' => true,
             ],
+            'url'      => [
+                'base_path' => '',
+            ],
         ];
 
         $this->set(array_replace_recursive($defaults, $options));

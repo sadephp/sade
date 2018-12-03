@@ -18,17 +18,26 @@ class Script extends Tag
     ];
 
     /**
-     * Render script html.
+     * Get attributes.
      *
-     * @return string
+     * @return array
      */
-    public function render()
+    protected function attributes()
     {
         $attributes = $this->options['attributes'];
 
         if (!is_array($attributes)) {
             $attributes = [];
         }
+
+        if (isset($attributes['src'])) {
+            $path = $this->sade->get('url.base_path');
+            $path = rtrim($path, '/');
+            $src = ltrim($attributes['src'], '/');
+            $attributes['src'] = sprintf('%s/%s', $path, $src);
+        }
+
+        $attributes = $this->options['attributes'];
 
         if (empty($attributes['type'])) {
             $attributes['type'] = 'text/javascript';
@@ -38,6 +47,17 @@ class Script extends Tag
             $attributes['data-sade-class'] = $this->options['class'];
         }
 
+        return $attributes;
+    }
+
+    /**
+     * Render script html.
+     *
+     * @return string
+     */
+    public function render()
+    {
+        $attributes = $this->attributes();
         $attr_html = '';
 
         foreach ($attributes as $key => $value) {

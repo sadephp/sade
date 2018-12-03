@@ -37,6 +37,11 @@ class Style extends Tag
             if (empty($attributes['rel'])) {
                 $attributes['rel'] = 'stylesheet';
             }
+
+            $path = $this->sade->get('url.base_path');
+            $path = rtrim($path, '/');
+            $src = ltrim($attributes['src'], '/');
+            $attributes['src'] = sprintf('%s/%s', $path, $src);
         }
 
         if (empty($attributes['type'])) {
