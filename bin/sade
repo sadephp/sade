@@ -72,8 +72,7 @@ foreach ($files as $file) {
     @mkdir($dest, 0755, false);
 
     if (basename($file) === 'index.php') {
-        $file = basename(str_replace('index.php', '', $file));
-        $dest = $dest . $file . $ext;
+        $dest = $dest . basename(str_replace('index.php', '', $file)) . $ext;
     } else {
         $dest = str_replace('.php', $ext, $dest . basename($file));
     }
