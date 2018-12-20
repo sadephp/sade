@@ -1,6 +1,7 @@
 {
   "name": "@sadephp/sade",
   "description": "Bridge package between Sade and Node",
+  "version": "1.0.0-alpha",
   "keywords": [
     "node",
     "php",
