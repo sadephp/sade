@@ -1,0 +1,11 @@
+bin
+build
+cache
+examples
+src
+tests
+
+.travis.yml
+composer.json
+composer.lock
+phpunit.xml.dist
