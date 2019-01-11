@@ -29,5 +29,9 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "bin": ["bin/sade"]
+    "bin": ["bin/sade"],
+    "scripts": {
+      "lint": "vendor/bin/phpcs --standard=PSR2 src",
+      "test": "vendor/bin/phpunit"
+    }
 }

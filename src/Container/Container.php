@@ -50,7 +50,7 @@ class Container extends Config
     }
 
     /**
-     * Set configuration value.
+     * Set container value.
      *
      * @param  string $key
      * @param  mixed  $value

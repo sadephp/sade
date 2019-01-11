@@ -5,8 +5,9 @@ namespace Sade\Component;
 use Hashids\Hashids;
 use IvoPetkov\HTML5DOMDocument;
 use Sade\Contracts\Sade;
+use Sade\Container\Container;
 
-class Component
+class Component extends Container
 {
     /**
      * Component directory.
@@ -251,7 +252,10 @@ class Component
             }
         }
 
-        return new Options($result, $extra, $this->sade);
+        $sade = clone $this->sade;
+        $sade->set($this->items());
+
+        return new Options($result, $extra, $sade);
     }
 
     /**
