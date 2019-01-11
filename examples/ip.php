@@ -5,7 +5,6 @@
 <script>
     var ip = '{{ ip }}';
     console.log(ip);
-    // hello world
 </script>
 
 <?php
