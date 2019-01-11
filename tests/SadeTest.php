@@ -143,12 +143,6 @@ class SadeTest extends TestCase
 
     public function testPluginRender()
     {
-        $this->sade->bind('http', function ($sade) {
-            return function ($url) {
-                return '1.1.1.1';
-            };
-        });
-
         $output = $this->sade->render('ip.php');
 
         $this->assertRegExp('/1\.1\.1\.1/', $output);
